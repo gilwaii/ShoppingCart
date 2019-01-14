@@ -1,0 +1,121 @@
+if(!(typeof MQDate === "function"))
+{
+    function MQDate(canYear,month,day,hours,minutes,seconds,milliseconds)
+    {
+        if(canYear==undefined)
+            var date=new Date();
+        if(typeof canYear == typeof "111")
+        {
+            if(canYear.length>10)
+            {
+                //var date=new Date(canYear);
+                var xArr=canYear.split(" ");
+                var leftTimeStr=xArr[0];
+                var leftTimeArr=leftTimeStr.split("-");
+                if(xArr.length<2)
+                {
+                    var date=new MQDate(leftTimeArr[0],leftTimeArr[1]-1,leftTimeArr[2],0,0,0,0);
+                }
+                else
+                {
+                    var rightTimeStr=xArr[1];
+                    var rightTimeArr=rightTimeStr.split(":");
+                    var date=new MQDate(leftTimeArr[0],leftTimeArr[1]-1,leftTimeArr[2],rightTimeArr[0],rightTimeArr[1],rightTimeArr[2],0);
+                }
+            }
+            else
+                canYear=parseInt(canYear);
+        }
+        
+        if(typeof canYear == typeof 1)
+        {
+            if(canYear>4000)
+                var date=new Date(canYear);
+            else
+                var date=new Date(canYear,month,day,hours,minutes,seconds,milliseconds);
+        }
+
+        date.getToday=function ()
+        {
+            return new MQDate(1900+date.getYear(),date.getMonth(),date.getDate(),0,0,0,0);
+        }
+
+        date.getYesterday=function()
+        {
+            var yesterdayTime=date.getToday().getTime()-24*60*60*1000;
+            return new MQDate(yesterdayTime);
+        }
+
+        date.getTomorrow=function ()
+        {
+            var tomorrowTime=date.getToday().getTime()+24*60*60*1000;
+            return new MQDate(tomorrowTime);
+        }
+
+        date.getThisWeek=function ()
+        {
+            var thisDay=date.getDay();
+            var thisWeekTime=date.getToday().getTime()-thisDay*24*60*60*1000;
+            return new MQDate(thisWeekTime);
+        }
+
+        date.getNextWeek=function ()
+        {
+            var thisDay=date.getDay();
+            var nextWeekTime=date.getToday().getTime()+(7-thisDay)*24*60*60*1000;
+            return new MQDate(nextWeekTime);
+        }
+
+        date.getThisMonth=function ()
+        {
+            return new MQDate(1900+date.getYear(),date.getMonth(),1,0,0,0,0);
+        }
+
+        date.getNextMonth=function ()
+        {
+            if(date.getMonth()==12)
+                return new MQDate(1900+date.getYear()+1,1,1,0,0,0,0);
+            else
+                return new MQDate(1900+date.getYear(),date.getMonth()+1,1,0,0,0,0);
+        }
+
+        date.getThisYear=function ()
+        {
+            return new MQDate(1900+date.getYear(),0,1,0,0,0,0);
+        }
+
+        date.getNextYear=function ()
+        {
+            return new MQDate(1900+date.getYear()+1,0,1,0,0,0,0);
+        }
+
+        date.calDayCount=function(year,month)
+        {
+            new Date(year,month,0).getDate();
+        }
+
+        date.toMQFormatString=function ()
+        {
+            var year=date.getYear()+1900;
+            var month=date.getMonth()+1;
+            if(month<10)
+                month="0"+month;
+            var thisDate=date.getDate();
+            if(thisDate<10)
+                thisDate="0"+thisDate;
+            var hours=date.getHours();
+            if(hours<10)
+                hours="0"+hours;
+            var minutes=date.getMinutes();
+            if(minutes<10)
+                minutes="0"+minutes;
+            var seconds=date.getSeconds();
+            if(seconds<10)
+                seconds="0"+seconds;
+            var str=year+"-"+month+"-"+thisDate+" "+hours+":"+minutes+":"+seconds;
+            return str;
+        }
+
+        return date;
+    }
+}

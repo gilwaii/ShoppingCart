@@ -1,0 +1,1949 @@
+/*jslint browser: true*/
+/*global $, jQuery, alert*/
+
+// js application
+var result = $("#news-main-content").height();
+$("#news-content #timeline").css({"height": result + 'px'});
+// End js application
+var isMobile = {
+    Android: function () {
+        return navigator.userAgent.match(/Android/i);
+    },
+    BlackBerry: function () {
+        return navigator.userAgent.match(/BlackBerry/i);
+    },
+    iOS: function () {
+        return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    },
+    Opera: function () {
+        return navigator.userAgent.match(/Opera Mini/i);
+    },
+    Windows: function () {
+        return navigator.userAgent.match(/IEMobile|Windows Phone|WPDesktop/i);
+    },
+    any: function () {
+        return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+    }
+};
+
+var changeWidth = {
+    width: $(window).width(),
+    check: function(){
+        var newWidth = $(window).width();
+        if(newWidth != this.width){
+            this.width = newWidth;
+            return true;
+        }
+        return false;
+    }
+}
+$(document).ready(function () {
+    "use strict";
+    //fix chiều cao cho ảnh tin tức (tránh việc browser tự làm tròn làm height không bằng nhau)
+    $('input:not([type="file"])').change(function() 
+    {
+        $(this).val($(this).val().trim());
+    });
+
+    //popup images
+    if (typeof popupshowed != "undefined" && popupshowed !=1) 
+    {
+        $('.overlay-index').addClass('pophienra');
+        $('.popup-index').addClass('pophienra');
+        setTimeout(function(){
+            $('.overlay-index').removeClass('pophienra');
+            $('.popup-index').removeClass('pophienra');
+        },10000);
+        
+    }
+
+    var parent_class = $('#video-gallery')[0];
+    if (typeof parent_class !== 'undefined') {
+        $('#video-gallery').lightGallery({
+            videojs: true
+        }); 
+        var mzOptions = {
+            selectorTrigger: "hover"
+        };
+    }
+    Readmore();
+    countTimerHomePage();
+    setImageHeight();
+    removeHover();
+    showDownload();
+    resizeChatbox();
+    setActive();
+    checkLink();
+    //cắt text
+    setTimeout(function() {
+        truncated();
+        // saveInlineCSS();
+    }, 5000);
+    
+
+    //-----------------fix click vào sản phẩm rùi back lại mất menu-top-------------//
+    displayMenu();
+    /*#############################*/
+    displayPosterVideo();
+    RotateVideoDetail();
+    validateInput();
+    checkoutShowAddNewsAddress();
+    /*#############################*/
+    chooseRating();
+    countDownBlockVerify();
+    rebuildCSSthisPage();
+    //menu-fixed
+    $(window).scroll(function () {
+        displayMenu();
+        MenuonScroll();
+        checkScrollTopButton();
+    });
+    $(window).resize(function (event) {
+        if(changeWidth.check()){
+            setImageHeight();
+            showDownload();
+            truncated();
+            
+        }
+        resizeChatbox("resize");
+        rotateScreen();
+    });
+    onlyNumber();
+
+    /*#############################*/
+    //search Mobile
+    $('.form-nav-mobile .icon-search').click(function(event) {
+        $('.mobile-search').toggleClass('hidden');
+        $('.keywordIp').focus();
+        if($('.mobile-search').hasClass('hidden'))
+            $('#PageContainer').css('margin-top', '30px');
+        else
+            $('#PageContainer').css('margin-top', '70px');
+    });
+    //Search Button
+    $('a.search').click(function () {
+        $('div.search-form').addClass('display');
+        $('.overlay').addClass('display');
+        return false;
+    });
+    $('.overlay').click(function () {
+        $('div.search-form').removeClass('display');
+        $('.overlay').removeClass('display');
+        $('ul.nav').removeClass('menu-active');
+        $('span.menu-button').removeClass('menu-btn-active');
+        return false;
+    });
+
+    $('#menu-mobile').click(function(event) {
+        $('.overmobile').toggleClass('overlaymb');
+        $('nav.mobile .user-menu-popup').toggleClass('display');
+        $('ul.nav').removeClass('menu-active');
+        $('.overlay').removeClass('display');
+        $('span.menu-button').removeClass('menu-btn-active');
+    });
+    $('.overmobile').click(function(event) {
+        $('.overmobile').removeClass('overlaymb');
+        $('nav.mobile .user-menu-popup').removeClass('display');
+    });
+    $('#close_btn').click(function(event){
+        $('.overlay-index').removeClass('pophienra');
+        $('.popup-index').removeClass('pophienra');
+    });
+    $('span.menu-button').click(function (event) {
+        event.stopPropagation();
+        $('ul.nav').toggleClass('menu-active');
+        $('span.menu-button').toggleClass('menu-btn-active');
+        $('.overlay').toggleClass('display');
+        $('.overmobile').removeClass('overlaymb');
+        $('nav.mobile .user-menu-popup').removeClass('display');
+    });
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var target = $(e.target).attr("href") // activated tab
+        var values = 0;
+        if(target == "#home"){
+            values = 1;
+            console.log(values);
+            $("#valueI").val(values);
+        }
+        else{
+            values = 2;
+            console.log(values);
+            $("#valueI").val(values);
+        }
+    });
+
+    $(".luachonphuongthucthanhtoan .nav .disable").removeClass("disable");
+    // $('.left_nav li').click(function(event){
+    //     $(".left_nav ul li").removeClass('active');
+    //     $(this).addClass('active');
+    // });
+    /*#############################*/
+    
+    //slick slide cho danh sách chuyên mục của trang chủ
+    $('.filter ul').slick({
+        dots: false,
+        infinite: false,
+        speed: 300,
+        slidesToShow: 8,
+        slidesToScroll: 4,
+        variableWidth: true,
+        responsive: [{
+            breakpoint: 1024,
+            settings: {
+                slidesToShow: 3,
+                slidesToScroll: 4,
+                infinite: false,
+                dots: false
+            }
+        }, {
+            breakpoint: 600,
+            settings: {
+                slidesToShow: 2,
+                slidesToScroll: 2
+            }
+        }, {
+            breakpoint: 480,
+            settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1
+            }
+        }]
+    });
+
+    //slide cho sản phẩm trang chủ
+    var $productHome = $(".product .slide").slick({
+        arrows: false,
+        draggable: false,
+        swipe: false,
+        focusOnSelect: false,
+        responsive: [{
+            breakpoint: 480,
+            settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                draggable: false,
+            }
+        }]
+    });
+
+    $productHome.slick("slickSetOption", "draggable", false, false);
+    //assign button cho slide chuyên mục trang chủ
+    $("#featured-products .button .next").click(function () {
+        $(".product .slide").slick("slickNext");
+    });
+
+    $("#featured-products .button .prev").click(function () {
+        $(".product .slide").slick("slickPrev");
+    });
+
+    $productHome.on("afterChange", function () {
+        $(".category-item").not(".slick-active").html("");
+
+    });
+
+
+    /*#############################*/
+    //lazyload image
+    $(".products .products-box .lazy").lazyload({
+        //effect: "fadeIn",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    
+    $(".products .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    $(".home-productslider .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+
+    $(".group_left.banner .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    $(".images-banner .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    
+    $("#item_product .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    
+    $(".bestseller-content .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+
+    $(".home_ouroffer_wrapper .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    
+    $(".new-arrival .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+
+    $("#footer_partner-content .imgage-news.lazy").lazyload({
+        //effect: "fadeIn",
+        placeholder     : "https://media.moki.vn/no-image.jpg",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    
+    $(".news img.lazy").lazyload({
+        //effect: "fadeIn",
+        failure_limit: 2,
+        skip_invisible: true
+    });
+    $("img").on("error", function(){
+        this.src="https://media.moki.vn/no-image.jpg";
+    });
+    //scroll khi click vào menu
+    $(".header-menu a").click(function () {
+
+        var id = $(this).attr("href");
+        if(!id) return;
+
+        var top = $(id).offset().top;
+        if (id == '#features') {
+            top -= 70;
+        }
+        $("body,html").animate({scrollTop: top}, 500);
+        window.location.hash = id;
+
+        $(".header-menu li").removeClass('active');
+        var Class = $(this).parent().attr("class");
+        $("." + Class).addClass('active');
+        return false;
+    });
+    $("#modal-rate").click(function(event) {
+      var id = $(this).data("id");
+      $("#purchase_id").attr("value",id);
+  });
+    $("#modal-ratemb").click(function(event) {
+      var id = $(this).data("id");
+      $("#purchase_id").attr("value",id);
+  });
+    var sourceSwap = function () {
+        var $this = $(this);
+        if($this.hasClass('selected')){
+            return;
+        }
+        var newSource = $this.data('alt-src');
+        $this.data('alt-src', $this.attr('src'));
+        $this.attr('src', newSource);
+    }
+    
+    
+    $('.popup-danhgia img[data-alt-src]').each(function() { 
+        new Image().src = $(this).data('alt-src'); 
+    }).hover(sourceSwap, sourceSwap); 
+    $('a.clickdanhgia').click(function () {
+        $('.overlaypopup, .popup-danhgia').addClass('hienpopup');
+        return false;
+    });
+    $('.overlaypopup').click(function () {
+        $('.overlaypopup, .popup-danhgia').removeClass('hienpopup');
+        return false;
+    });
+
+
+    $('a.clickdownload').click(function () {
+        $('.overlaypopup, .popup-thongbao').addClass('hienpopup');
+        $('.overmobile').removeClass('overlaymb');
+        $('nav.mobile .user-menu-popup').toggleClass('display');
+        return false;
+    });
+    $('#download').click(function(event) {
+        if($('body').find('.modal-backdrop').length == 1)
+        {
+            $(this).modal("hide");
+        }
+    });
+
+    $('.overlaypopup').click(function () {
+        $('.overlaypopup, .popup-thongbao').removeClass('hienpopup');
+        return false;
+    });
+
+    /*#############################*/
+
+    //button readmore ở trang chuyên mục sản phẩm
+    $(".readmore-text").click(function () {
+        $(".category_less").hide();
+        $(".category_more").show();
+    });
+    /*#############################*/
+
+    //sự kiện click vào menu trong ô search
+    $("#ProductsSearchProductForm ul li a").click(function () {
+        $("#text-dm").html($(this).html());
+        $("#search_concept").attr("data-category-id", $(this).data("cid"));
+        $("#search_concept").attr("data-category-name", $(this).data("cname"));
+    });
+    $("#ProductsSearchProductForm").submit(function () {
+        var categoryName = $("#search_concept").attr("data-category-name");
+        var categoryID = $("#search_concept").attr("data-category-id");
+        var productName = $("#ProductsSearchProductForm .text-search").val();
+        if (categoryID == 0 && productName == "") {
+            return false;
+        }
+        if (productName == "") {
+            var url = "/" + categoryName + "-" + categoryID + ".html";
+        } else {
+            if (typeof categoryID == "undefined") {
+                categoryName = "tat-ca";
+                categoryID = 0;
+            }
+            var url = "/tim-kiem/" + categoryName + "-" + categoryID + "/" + productName + ".html";
+        }
+
+        window.location = url;
+        return false;
+    });
+    $("#NewsSearchNewsForm").submit(function () {
+        var productName = $("#NewsSearchNewsForm .text-search").val();
+        var url = "/tim-kiem-bai-viet/" + productName + ".html";
+
+        window.location = url;
+        return false;
+    });
+    $("#ProductsSearchProductFormMobile").submit(function () {
+        var categoryName = $("#search_concept").attr("data-category-name");
+        var categoryID = $("#search_concept").attr("data-category-id");
+        var productName = $("#ProductsSearchProductFormMobile .keywordIp").val();
+        if (categoryID == 0 && productName == "") {
+            return false;
+        }
+        if (productName == "") {
+            var url = "/" + categoryName + "-" + categoryID + ".html";
+        } else {
+            if (typeof categoryID == "undefined") {
+                categoryName = "tat-ca";
+                categoryID = 0;
+            }
+            var url = "/tim-kiem/" + categoryName + "-" + categoryID + "/" + productName + ".html";
+        }
+
+        window.location = url;
+        return false;
+    });
+
+    /*#############################*/
+    
+    setTimeout(function(){
+		if($(".product-hot").length){
+			if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0 && ($(window).width() >= 992 && $(window).width() <= 1024)) // 
+			{
+					var win = $(window);
+					var $el = $('.product-hot');
+					var top = $el.offset().top - 135;
+					win.scroll(function() {
+						var bottom = $(".main-content").offset().top + $(".main-content").height() -  $(window).height() + 135;
+						// alert($(window).scrollTop());
+						if(!$el.hasClass("affix") && $(window).scrollTop() >= top && $(window).scrollTop() < bottom){
+							$el.addClass('affix').css('top', 70);
+						}
+						else if($el.hasClass("affix") && $(window).scrollTop() < top){
+							$el.removeClass('affix').removeClass('affix-top').css('top', 0);
+						}
+						else if($el.hasClass("affix") && $(window).scrollTop() >= bottom){
+							$el.removeClass('affix').addClass('affix-bottom').css('top', bottom - top);
+						}
+					});
+			// alert("Browser is Safari");       
+			}
+			else{
+					$(".product-hot").affix({
+						offset:{
+							top: $(".product-hot").offset().top - 135,
+							bottom: $(document).height() - $(".main-content").offset().top - $(".main-content").height() - 30
+						}
+					});
+			}
+		}
+    },2000);
+
+    if (typeof Swiper !== 'undefined') {
+		if($(".multiple").length > 0){
+			var swiperMultiple = new Swiper('.multiple', {
+				paginationClickable: true,
+				spaceBetween: 30,
+				centeredSlides: true,
+				preventClicks: false,
+				autoplay: 2500,
+				speed: 600,
+				autoplayDisableOnInteraction: false,
+				breakpoints: {
+					480: {
+						slidesPerView: 1,
+						spaceBetween: 10
+					}
+				}
+			});
+			lazyLoadSwiper(swiperMultiple, '.multiple');
+		}
+
+        $(".multiple.swiper-container").on({
+            mouseenter: function () {
+                swiperMultiple.stopAutoplay();
+            },
+            mouseleave: function () {
+                swiperMultiple.startAutoplay();
+            }
+        });
+    }
+    if (typeof Swiper !== 'undefined') {
+		if($(".item-product-relate-mobile").length > 0){
+
+			var swiperProductRelate= new Swiper('.product-relate.swiper-container', {
+				direction: 'vertical',
+				loop: true,
+				slidesPerView: 3,
+				height: 150*3,
+				autoplay: 2500,
+				speed: 600,
+			});
+			lazyLoadSwiper(swiperProductRelate, '.product-relate.swiper-container');
+		}
+		if($(".item-product-relate-mobile").length > 0){
+			var swiperProductRelateMobile = new Swiper('.item-product-relate-mobile', {
+				slidesPerView: 3,
+				spaceBetween: 20,
+				autoplay: 2500,
+				speed: 600,
+				autoplayDisableOnInteraction: false,
+				breakpoints: {
+					991:{
+						slidesPerView: 2,
+						spaceBetween: 30,
+					},
+					767: {
+						slidesPerView: 1,
+						spaceBetween: 30,
+					},
+				}
+			});
+			lazyLoadSwiper(swiperProductRelateMobile, '.item-product-relate-mobile');
+		}
+        
+		if($(".item-featured").length > 0){
+			var swiperFeatured = new Swiper('.item-featured', {
+				paginationClickable: true,
+				autoplay: 2500,
+				preventClicks: false,
+				speed: 600,
+				slidesPerView: 3,
+				spaceBetween: 30,
+				freeMode: true,
+				autoplayDisableOnInteraction: false,
+				breakpoints: {
+					1024: {
+						slidesPerView: 2,
+						spaceBetween: 40
+					},
+					991: {
+						slidesPerView: 2,
+						spaceBetween: 30
+					},
+					767: {
+						slidesPerView: 1,
+						spaceBetween: 30,
+					},
+				}
+			});
+			lazyLoadSwiper(swiperFeatured, '.item-featured');
+		}
+        
+    }
+
+
+    $('.owl-carousels').slick({
+        infinite: true,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        responsive: [
+        {
+            breakpoint: 992,
+            settings: {
+                arrows: false,
+            }
+        }]
+    });
+
+    if (typeof Swiper !== 'undefined') {
+        var swiperShow = new Swiper('.slide-show', {
+            paginationClickable: true,
+            spaceBetween: 30,
+            preventClicks: false,
+            centeredSlides: true,
+            nextButton: '.swiper-button-next',
+            prevButton: '.swiper-button-prev',
+            autoplay: 3000,
+            speed: 600,
+            autoplayDisableOnInteraction: false,
+            breakpoints: {
+                480: {
+                    slidesPerView: 1,
+                    spaceBetween: 10
+                }
+            }
+        });
+
+        $(".slide-show.swiper-container").on({
+            mouseenter: function () {
+                $('.swiper-button-next').show();
+                $('.swiper-button-prev').show();
+                swiperShow.stopAutoplay();
+            },
+            mouseleave: function () {
+                $('.swiper-button-next').hide();
+                $('.swiper-button-prev').hide();
+                swiperShow.startAutoplay();
+            }
+        });
+    }
+    
+
+    /*#############################*/
+    //slide product detail
+    $('.slider-for').slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: false,
+        fade: true,
+        autoplay: false,
+        asNavFor: '.slider-nav'
+    });
+    $('.slider-nav').slick({
+        arrows: false,
+        vertical: true,
+        slidesToShow: 4,
+        slidesToScroll: 1,
+        asNavFor: '.slider-for',
+        dots: false,
+        centerMode: true,
+        focusOnSelect: true,
+        responsive: [{
+            breakpoint: 992,
+            settings: {
+                slidesToShow: 3,
+                vertical: false,
+            }
+        }]
+    });
+
+    $('section#product-detail .row .full a').hover(function() {
+        $('section#product-detail .row .full a').removeClass('mz-thumb-selected');
+        $(this).addClass('mz-thumb-selected');
+    });
+
+
+    $("#product-detail .row .full").show();
+
+    // remember document ready on this
+    //$('.slider-nav .slick-slide').eq(0).addClass('slick-current');
+    $("section#news-home div.slide .item_big").show();
+    
+
+    $('#download').on('shown.bs.modal', function (e) {
+        var myCarousel = $('.multiple-items-cart');
+        if (typeof myCarousel.slick !== 'undefined') {
+            myCarousel.slick({
+                infinite: true,
+                slidesToShow: 4,
+                slidesToScroll: 1,
+                prevArrow: ".prev-3",
+                nextArrow: ".next-3",
+                responsive: [{
+                    breakpoint: 480,
+                    settings: {
+                        slidesToShow: 2,
+                        slidesToScroll: 1
+                    }
+                }]
+            });
+        }
+        myCarousel.resize();
+    });
+
+    $("#changePassword").submit(function(e) {
+        var oldPassword = $('#oldPassword').val();
+        var newPassword = $('#newPassword').val();
+        if((oldPassword.length != 0) && (newPassword.length != 0)){
+            $.ajax({
+                url: '/ShoppingCarts/change_password',  
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    oldPassword: oldPassword,
+                    newPassword: newPassword
+                },
+                success: function(data,success) {
+                    console.log(data);
+                    console.log(success);
+                    if (success)
+                    {
+                        if (data.success)
+                        {
+                            toastr.success("Thay đổi mật khẩu thành công.");
+                            setTimeout(function(){
+                                window.location = "/ShoppingCarts/manager_user";
+                            },300);
+                        } 
+                        else{
+                            $('#oldPassword').val("");
+                            toastr.error(data.message);
+                        }
+                    }
+                    else
+                        toastr.error("Kết nối có lỗi vui lòng kiểm tra lại!");
+                }
+            });
+        }
+    });
+
+    if (typeof WOW !== 'undefined') {
+        //wow init
+        var wow = new WOW(
+        {
+                boxClass: 'wow',      // animated element css class (default is wow)
+                animateClass: 'animated', // animation css class (default is animated)
+                offset: 0,          // distance to the element when triggering the animation (default is 0)
+                mobile: false,       // trigger animations on mobile devices (default is true)
+                live: true,       // act on asynchronously loaded content (default is true)
+                callback: function (box) {
+                    // the callback is fired every time an animation is started
+                    // the argument that is passed in is the DOM node being animated
+                },
+                scrollContainer: null // optional scroll container selector, otherwise use window
+            }
+            );
+        wow.init();
+    }
+    if (typeof getAddr !== 'undefined' && $.isFunction(getAddr)) {
+        getAddr("#selectCity",$("#selectCity").data("selected"),1,1);
+        getAddr("#selectProvince",$("#selectProvince").data("selected"),2,$("#selectCity").data("selected") || 1);
+        getAddr("#selectWard",$("#selectWard").data("selected"),3,$("#selectProvince").data("selected") || 1);
+
+        $("#selectCity").change(function(){
+            var cityID = $(this).val();
+            getAddr("#selectProvince",$("#selectProvince").data("selected"),2,cityID, changeWard);
+            $('#selectProvince').attr('disabled', 'disabled');
+            $('#selectWard').attr('disabled', 'disabled');
+        });
+
+        
+        $("#selectProvince").change(function(event) {
+            var ProvinceID = $(this).val();
+            getAddr("#selectWard",$("#selectWard").data("selected"),3,ProvinceID);
+            $('.checkout .loading-img').removeClass('hide');
+            $("#selectWard").change();
+        });
+        $("#selectWard").change(function(event){
+            $('#selectProvince').removeAttr('disabled');
+            $('#selectWard').removeAttr('disabled');
+        });
+    }
+    $('.rateit').bind('rated reset', function (e) {
+        var ri = $(this);
+        var value = ri.rateit('value');
+        var ID = ri.data('id');
+        var Type = ri.data('type');
+        ri.rateit('readonly', true);
+
+        $.ajax({
+            url: '/Homes/rate',
+            data: {type: Type, id: ID, value: value},
+            type: 'POST',
+            success: function (data) {
+            }
+        });
+    });
+
+    /*#############################*/
+    //bình luận tinh tức
+    var $btnSend;
+
+    $("section#news-detail").on("click", ".send-comment", function () {
+        console.log("fsđsf");
+        var $commentInput = $(this).parents(".comment-form").find(".input-comment");
+        if ($commentInput.val().trim() == "") {
+            $("#modal-msg .modal-body").html("Bạn chưa viết bình luận.");
+            $("#modal-msg").modal("show");
+            return;
+        }
+        var checkLogin = checkLogined();
+        if (!checkLogin) {
+            $btnSend = $(this);
+            $("#modal-login").modal("show");
+        } else {
+            $("#modal-login").modal("hide");
+            $("#modal-msg .modal-body").html("Cảm ơn bạn đã gửi bình luận.");
+            $("#modal-msg").modal("show");
+
+            var data = {
+                userInfo: UserInfo,
+                comment: $commentInput.val(),
+                parentID: $commentInput.data("parent-id"),
+                postID: $("#postID").val(),
+            };
+            $commentInput.val("");
+            $.ajax({
+                url: '/Posts/comment',
+                type: 'POST',
+                dataType: 'text',
+                data: data,
+                success: function (result) {
+                    if (result == 1) {
+                        reloadComment();
+                        //toastr.success("Đăng tin thành công chờ duyệt!");
+                    }
+                    if (result == 0) {
+                        //toastr.success("Có lỗi xin vui lòng thử lại!");
+                    }
+                }
+            });
+
+        }
+    });
+
+    $("body").on("click", ".reply a", function () {
+        $(".comment-insert").empty();
+        var CommentForm = $(".comment-form").clone();
+        $(CommentForm).find('textarea').val('');
+        var $parentForm = $(this).parents(".text-comment.parent");
+        $parentForm.find(".comment-insert").append(CommentForm);
+        $parentForm.find(".input-comment").attr("data-parent-id", $parentForm.data("comment-id")).focus();
+        return false;
+    });
+
+    $("body").on("click", ".social a", function () {
+        window.open($(this).attr("href"), 'Moki Share', 'width=650, height=450, menubar=no, toolbar=no, scrollbars=yes');
+        return false;
+    });
+
+    $("body").on('click' , 'figcaption.item-btn-detail' , function () {
+        var self = this;
+        if($(self).siblings('a').length > 0){
+            var a = $(self).siblings('a');
+            $(a)[0].click();
+        }
+    });
+
+    /*#############################*/
+    //gửi email
+    $("#sentEmail").submit(function (event) {
+        event.preventDefault();
+        var email = $("#email").val();
+        var div = $('#popup_content');
+        if (!validateEmail(email)) {
+            div.html('Email chưa được nhập hoặc không đúng, làm ơn nhập đúng địa chỉ email');
+            $("#registerModel").modal("show");
+            return false;
+        }
+
+        /* Act on the event */
+        $.ajax({
+            url: "/homes/add",
+            type: 'post',
+            data: {email: email},
+            success: function (result) {
+                var message = result.message;
+
+                div.html(message);
+                // console.log(result);
+                if (result.sucess == true) {
+                    $("#email").val("");
+                }
+                $("#registerModel").modal("show");
+
+            }
+        });
+        return false;
+    });
+
+    $('.wraper .menu a').click(function (event) {
+        if ($(this).attr('href') == '/#features') {
+            scrollIntoView('features');
+            event.preventDefault();
+        }
+        $('span.menu-button').click();
+    });
+
+    $('video').click(function () {
+        if (typeof $(this).pause == 'function') {
+            $(this).pause();
+        }
+    });
+
+    /*#############################*/
+    //get more comment trang chi tiet tin
+    $("#commentPost").click(function () {
+        var index = $(this).attr("data-index");
+        var id = $(this).data("id");
+        $.ajax({
+            url: "/Posts/get_comments",
+            type: "post",
+            dataType: "text",
+            data: {
+                index: index,
+                post_id: id,
+            },
+            success: function (result) {
+
+                var json = JSON.parse(result);
+                var html = json.html;
+                var end = json.end;
+                $("#commentPost").attr("data-index", parseInt(index) + 1);
+                var olderVal = $("#commentDiv").html();
+                var newVal = olderVal + html;
+                $("#commentDiv").html(newVal);
+                if (end == 1)
+                    $("#commentPost").hide();
+            }
+        });
+    });
+
+
+    $('section#video').on('click', '.auto-play', function (event) {
+        event.preventDefault();
+        video_clicked($(this))
+        /* Act on the event */
+    });
+
+    $('section#product-detail').on('click', 'video', function (event) {
+        // if ((navigator.userAgent.indexOf("Firefox") > - 1) && document.body.mozRequestFullScreen) {
+        //     return;
+        // }    
+        // event.preventDefault();
+        // video_clicked($(this));
+        // /* Act on the event */
+
+    });
+    // Send Comment Product 
+
+    $("section#product-detail").on("click", ".send-comment", function () {
+        var olderUser = mqCookie.getCookie("user");
+        if(olderUser==null){
+            if(typeof this.wLogin !="undefined"){
+                console.log(this.wLogin.closed);
+                if(!this.wLogin.closed){
+                    this.wLogin.focus();
+                    return;
+                }
+            }
+            else{
+                //first bind Event
+                if (window.addEventListener) 
+                {
+                    window.addEventListener("message",function (message)
+                    {
+                        var data=message.data;
+                        if(data.type=="onLogin" || data.type=="onLogout")
+                        {
+                            if(data.type=="onLogin")
+                            {
+                                _this.click();
+                            }
+                        }
+                    }, false);
+                }
+                else
+                {
+                    window.attachEvent("onmessage",function (message)
+                    {
+                        var data=message.data;
+                        if(data.type=="onLogin" || data.type=="onLogout")
+                        {
+                                _this.click();
+                        }
+                    });
+                }
+            }
+            var _this = this;
+            this.wLogin = window.open("/users/login","_blank","toolbar=yes,scrollbars=yes,resizable=yes");
+            return;
+        }
+
+
+        var product_id = $('#productID').val();
+        var product_name = $('#productName').val();
+        var commentInput = $(this).parents(".comment-form").find(".input-comment").val();
+        console.log(commentInput);
+        var data = {
+            product_id: product_id,
+            product_name: product_name,
+            comment: commentInput,
+            index: 0,
+            count: 5,
+        };
+        $.ajax({
+            url: '/Products/set_comment_product',
+            type: 'POST',
+            dataType: 'text',
+            data: data,
+            success: function (result) 
+            {
+                var data = JSON.parse(result);
+                console.log(data);
+                if (data.success) {
+
+                    reloadCommentProduct();
+                    $('.box-comment .input-comment').val("");
+                }
+                else{
+                    if(data.message == "Bạn chưa đăng nhập!"){
+                        window.location.href = "/users/login";
+                    }
+                    else
+                        toastr.success("Có lỗi trong quá trình bình luận sản phẩm!");
+                }            
+            }
+        });
+    });
+
+
+
+    if($('section#product-detail').length > 0){
+        var index = 0;
+        var product_id = $('section#product-detail').attr("product-id");
+        $('section#product-detail').on('click',"#commentReadMoreBt", function (){
+            $.ajax({
+                url: "/Products/get_comments",
+                type: "post",
+                dataType: "text",
+                data: {
+                    index: index,
+                    product_id: product_id
+                },
+                success: function (result)
+                {
+
+                    var json = JSON.parse(result);
+                    var html = json.html;
+                    var end = json.end;
+                    index++;
+                    if(html !=""){
+                        $("#commentDiv .no-comments").remove();
+                    }
+                    var olderVal = $("#commentDiv").html();
+                    var newVal = olderVal + html;
+                    $("#commentDiv").html(newVal);
+                    if (end == 1)
+                        $("#commentReadMoreBt").hide();
+                }
+            });
+        });
+		$("body").on("afterChange init",".slick-slider.slick-with-lazy", function () {
+        	$(this).find(".lazy").lazyload({
+                            // effect: "fadeIn",
+                            placeholder     : "https://media.moki.vn/no-image.jpg",
+                            failure_limit: 2,
+                            skip_invisible: false
+                	});
+
+    	});
+
+
+        setTimeout(function(){
+            $('section#product-detail #commentReadMoreBt').click();
+            //load same Category
+            $.ajax({
+                url: '/Products/get_same_category',
+                type: 'POST',
+                dataType: 'html',
+                data: {product_id: product_id},
+            })
+            .done(function(html) {
+                $(".ajax-same-category").html(html);
+                $('.multiple-items1').slick({
+                    infinite: true,
+                    slidesToShow: 4,
+                    slidesToScroll: 4,
+                    prevArrow: ".prev-2",
+                    nextArrow: ".next-2",
+                    responsive: [{
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 1
+                        }
+                    }]
+                });
+					
+            });
+            //load same Category
+            $.ajax({
+                url: '/Products/get_same_user',
+                type: 'POST',
+                dataType: 'html',
+                data: {product_id: product_id},
+            })
+            .done(function(html) {
+                $(".ajax-same-user").html(html);
+                $('.multiple-items').slick({
+                    infinite: true,
+                    slidesToShow: 4,
+                    slidesToScroll: 4,
+                    prevArrow: ".prev-1",
+                    nextArrow: ".next-1",
+                    responsive: [{
+                        breakpoint: 480,
+                        settings: {
+                            slidesToShow: 2,
+                            slidesToScroll: 1
+                        }
+                    }]
+                });
+            });
+        },1000);
+
+
+    }
+
+
+    $('form#sentEmail').on('focus blur click touchstart', 'input[type="email"]', function (event) {
+        if (!isMobile.any()) return;
+        event.stopPropagation();
+        if (event.type == 'click') {
+            $('#chatbox_support').addClass('hide');
+        }
+        else {
+            $('#chatbox_support').removeClass('hide');
+        }
+    });
+    //----------------------------đẩy textbox lên----------------------//
+    checkTextboxIsCover('form#UserLoginForm', '#UserPassword', 'button#btn-submit', 150);
+    checkTextboxIsCover('form#UserAccuracyForm', '#UserCodeVerify', 'button#btnAccuracy', 130);
+    checkTextboxIsCover('form#UserRegisterForm', '#UserPhonenumber', 'button#btnRegister', 130);
+    checkTextboxIsCover('form#UserConfirmInfoForm', '#UserUsername', 'button#btnConfirmInfo', 60);
+    //--------------------------------------------------------------//
+    //------------------Focus text box search hide menu --------------//
+    $("#product_name").focus(function () {
+        $('div.overlay').removeClass('display');
+        $('.menu-button').removeClass('menu-btn-active');
+        $('ul.nav').removeClass('menu-active');
+    });
+    //Click event to scroll to top
+    $('.scrollToTop').click(function () {
+        $('html, body').animate({scrollTop: 0}, 800);
+        return false;
+    });
+
+    //Check mau button danh gia
+    $("#content_id").keydown(function() {
+        setTimeout(function(){
+            var checklength = $("#content_id").val().length;
+            if(checklength >= 6 && check==true){
+                $('.popup-danhgia button').css('background', '#f16e8e');
+            }
+            else{
+                $('.popup-danhgia button').css('background', '#9E9E9E');
+            }
+        },100);
+    });
+    
+//end document ready
+});
+$(window).load(function() { // better to use $(document).ready(function(){
+    $('#product-detail .product-thumb.mobile .item a').on('click touchstart', function() {
+        $('#product-detail .product-thumb.mobile .item a').removeClass('mz-thumb-selected');
+        $(this).addClass('mz-thumb-selected');
+    });
+});
+
+window.addEventListener('scroll', auto_play_video, false);
+
+function reloadComment(){
+    var id = $("#commentPost").data("id");
+    $.ajax({
+        url: "/Posts/get_comments",
+        type: "post",
+        dataType: "text",
+        data: {
+            index: 0,
+            post_id: id,
+        },
+        success: function (result) {
+
+            var json = JSON.parse(result);
+            var html = json.html;
+            var end = json.end;
+            var newVal = html;
+            $("#commentDiv").html(newVal);
+            if (end == 1)
+                $("#commentPost").hide();
+        }
+    });
+}
+function reloadCommentProduct(){
+    var index = 0;
+    var product_id = $('section#product-detail').attr("product-id");
+    $.ajax({
+        url: "/Products/get_comments",
+        type: "post",
+        dataType: "text",
+        data: {
+            index: index,
+            product_id: product_id
+        },
+        success: function (result)
+        {
+
+            var json = JSON.parse(result);
+            var html = json.html;
+            var end = json.end;
+            index++;
+            $("#commentDiv").attr('data-index',index);
+            if(html !=""){
+                $("#commentDiv .no-comments").remove();
+                $("#commentDiv").html("");
+            }
+            var olderVal = $("#commentDiv").html();
+            var newVal = olderVal + html;
+            $("#commentDiv").html(newVal);
+            if (end == 1)
+                $("#commentReadMoreBt").hide();
+        }
+    });
+}
+document.addEventListener('touchstart', function(e) {
+    if (!isTextInput(e.target) && isTextInput(document.activeElement)) {
+        document.activeElement.blur();
+    }
+}, false);
+
+function video_clicked($video) {
+    if ($video.get(0).paused) {
+        $video.get(0).play();
+    } else {
+        $video.get(0).pause();
+    }
+
+
+}
+
+function removeHover() {
+    var anchors = document.getElementsByTagName('a');
+    for (i = 0; i < anchors.length; i++) {
+        anchors[i].addEventListener('touchstart', function (e) {
+            $(this).mouseleave();
+        }, false);
+    }
+}
+
+function setImageHeight() {
+    return;
+    //Set image height at homepage 
+    //bo qua tren mobile
+    if($(window).width() < 768) return;
+    // var contain_width;
+    // $("#news img").each(function () {
+    //     if ($(this).attr("width") == undefined) {
+    //         var parent = $(this).closest('.new-item');
+    //         var width = $(parent).width();
+    //         if ($(parent).hasClass('new-side-item')) {
+    //             if (contain_width) {
+    //                 width = contain_width;
+    //             } else {
+    //                 contain_width = width;
+    //             }
+    //         }
+    //         var height = Math.ceil(width / 560 * 292) + 1;
+    //         $(this).css("height", height + "px");
+    //     }
+    // });
+    $("#news-home .box-shadow img").each(function () {
+        if ($(this).attr("width") == undefined) {
+            var width = $(this).width();
+            var height = Math.ceil(width / 560 * 292) + 1;
+            if (!$(this).hasClass('commentor_avatar')) {
+                $(this).css("height", height + "px");
+            }
+        }
+    });
+}
+
+function MenuonScroll(event) {
+    if($(window).width() < 768) return;
+
+    var scrollPos = $(document).scrollTop();
+    $('.header-menu li a').each(function () {
+        var $li=$(this).parent();
+        var classNameStr=$li.attr("class");
+        if(classNameStr==undefined)
+            return ;
+        var firstClassName=classNameStr.split(" ")[0]
+
+        var refElement = $("#"+firstClassName);
+        if (refElement.length > 0 && refElement.position().top - 100 <= scrollPos) {
+            $('.header-menu li').removeClass("active");
+            $li.addClass("active");
+        }
+        else {
+            $li.removeClass("active");
+        }
+    });
+}
+
+function truncated() {
+    if (typeof $(".truncated").dotdotdot == 'function') {
+        $(".truncated").dotdotdot({
+            height: $(this).height() + "px",
+            after: "a.readmore",
+        });
+    }
+}
+
+function showDownload() {
+    // console.log("vao");
+    //check nếu màn hình < 992px chỉ hiện nút download của OS đang sử dụng
+    if ($(window).width() < 992) {
+        // console.log("vao");
+        $(".download a").each(function () {
+            // console.log("vao");
+            if ($(this).attr('href') != '#download') {
+                $(this).hide();
+            }
+        });
+
+        $("section#download .content .market a").hide();
+        $("div#download .modal-body .download a").hide();
+        $("section.popup-thongbao div.content div.khoiduoi a").hide();
+        if (isMobile.iOS()) {
+            $($(".content .download a")[0]).show();
+            $($("section#download .content .market a")[0]).show();
+            $($("div#download .modal-body .download a")[0]).show();
+            $("#ios").show();
+            $("#linkios").show();
+        } else if (isMobile.Android()) {
+            $($(".content .download a")[1]).show();
+            $($("section#download .content .market a")[1]).show();
+            $($("div#download .modal-body .download a")[1]).show();
+            $("#android").show();
+            $("#linkandroid").show();
+        } else if (isMobile.Windows()) {
+            $($(".content .download a")[2]).show();
+            $($("section#download .content .market a")[2]).show();
+            $($("div#download .modal-body .download a")[2]).show();
+            $("#windowphone").show();
+            $("#linkwindowphone").show();
+        }
+    }
+    else {
+        $(".content .download a").show();
+        $("section#download .content .market a").show();
+        $("div#download .modal-body .download a").show();
+    }
+}
+
+function validateEmail(email) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
+//-------------------------------------//
+function checkScrollTopButton() {
+    if($(window).width() < 768) return;
+
+    if ($(this).scrollTop() > 200) {
+        $('.scrollToTop').fadeIn();
+    } else {
+        $('.scrollToTop').fadeOut();
+    }
+}
+
+function scrollIntoView(eleID) {
+    var e = document.getElementById(eleID);
+    var top = e.offsetTop - 70;
+    if (!!e && e.scrollIntoView) {
+        window.scroll(0, top);
+    }
+}
+
+/*#############################*/
+//auto play video
+function auto_play_video(event) {
+
+    if (window.innerWidth < 768) return;
+    var $video = $(".video.auto-play"),
+    is_scroll = event.type == 'scroll';
+
+    if ($video.length > 0) {
+        if (is_scroll) {
+            var vh = $video.height();
+            var vp = $video.offset().top;
+            var wh = $(window).height();
+            var scrollTop = $(window).scrollTop();
+            var topOK = vp > scrollTop;
+            var bottomOK = vp + vh < scrollTop + wh;
+            var newFullScreen = (vp == 0);
+            var oldFullScreen = $video.attr("fullscreen");
+            $video.attr("fullscreen", newFullScreen);
+
+            if (newFullScreen + "" != oldFullScreen) return;
+            if (topOK && bottomOK) {
+                $video[0].play();
+            } else {
+                $video[0].pause();
+            }
+        }
+    }
+}
+
+function callback() {
+    if (typeof $btnSend != "undefined") {
+        $("#modal-login").modal("hide");
+        $btnSend.click();
+    }
+}
+function resizeChatbox(type){
+    if(type==undefined||type==null)
+    {
+        if($(window).height() < 430){
+            $(".chatbox").hide();
+            return;
+        }
+        else{
+            $(".chatbox").show()
+        }
+    }
+    
+    var height = Math.min(430,$(window).height() - 70);
+    $(".chatbox").css({
+        "bottom": - height + 50 +"px",
+        "height":  height + "px"
+    });
+    if($(window).width() < 430){
+        $(".chatbox").css({
+            "right": ($(window).width() - 320) / 2 +"px",
+        });
+    }
+}
+
+function rotateScreen() {
+    if(window.innerWidth > 992){
+        if($('#ProductsSearchProductForm input[type="text"]').is(":focus")) return;
+        if($('ul.nav').hasClass('menu-active')) $('ul.nav').removeClass('menu-active');
+        if($('span.menu-button').hasClass('menu-btn-active')) $('ul.nav').removeClass('menu-btn-active');
+        if($('.overlay').hasClass('display')) $('.overlay').removeClass('display');
+    }
+    return;
+}
+function displayMenu(){
+    if ($(window).scrollTop() > 100) {
+        if($('nav.fix-top').hasClass('display') == false){
+            $('nav.fix-top').addClass('display');
+            $('nav.fix-top').css('top', 0);
+            // $('header .breadcrumbs').css('padding-top', 0);
+            $('.top-cartbar').removeClass('display');
+        }
+    } else {
+        $('nav.fix-top').removeClass('display');
+        $('.top-cartbar').addClass('display');
+        $('nav.fix-top').css('top', 30);
+        // $('header .breadcrumbs').css('padding-top', 30);
+    }
+}
+function displayPosterVideo(){
+    var video=$('section#product-detail video');     
+    if(video.length > 0){
+        video = video.get(0);
+        video.addEventListener('ended',function(){
+            v=video.currentSrc;
+            video.src='';
+            video.src=v;
+            video.load();         
+        });
+    }   
+    
+}
+
+function isTextInput(node) {
+    return ['INPUT', 'TEXTAREA'].indexOf(node.nodeName) !== -1;
+}
+function RotateVideoDetail(){
+    var $el = $(".video-full video");
+
+    $(".video-full").show();
+}
+function findCriticalCSS(w, d){
+
+    //Setup our Pseudo selector killer, view height and critical nodes
+    var removePseudo = /([^\s,\:\(])\:\:?(?!not)[a-zA-Z\-]{1,}(?:\(.*?\))?/g;
+        var height = w.innerHeight;
+        var criticalNodes = [];
+
+    //Go find all the critical nodes
+    var walker = d.createTreeWalker(d, NodeFilter.SHOW_ELEMENT, function(node) { return NodeFilter.FILTER_ACCEPT; }, true);
+    while(walker.nextNode()) {
+        var node = walker.currentNode;
+        //var rect = node.getBoundingClientRect();
+        if(node.offsetTop < height) {
+            criticalNodes.push(node);
+        } 
+    }
+    console.log("Found " + criticalNodes.length + " critical nodes");
+
+    //Grab loaded stylesheets
+    var sheets = document.styleSheets;
+
+    var outCss = Array.prototype.map.call(sheets,function(sheet){
+        var rules = sheet.rules || sheet.cssRules;
+        //If there are rules
+        if(rules){
+            return {
+                sheet: sheet,
+                rules: Array.prototype.map.call(rules, function(rule){ //Convert each CSSRule into a 
+                    try{
+                        if(rule instanceof CSSMediaRule){
+                            var subRules = rule.rules || rule.cssRules;
+                            var css = Array.prototype.filter.call(subRules, function(rule){
+                                return criticalNodes.filter(function(e){ return e.matches(rule.selectorText.replace(removePseudo,"$1"))}).length > 0;
+                            }).map(function(rule){return rule.cssText}).reduce(function(ruleCss,init){return init + "\n" + ruleCss;},"");
+                            return css ? ("@media " + rule.media.mediaText + " { " + css + "}") : null;
+
+                        }else if(rule instanceof CSSStyleRule){
+
+                            return criticalNodes.filter(function(e){ return e.matches(rule.selectorText.replace(removePseudo,"$1"))}).length > 0 ? rule.cssText : null;
+
+                        }else{
+                            console.warn("allowing", rule);
+                            return rule.cssText;
+                        }
+                    }catch(e){
+                        console.log("Bad CSS rule", rule.selectorText);
+                        //throw e;
+                    }
+                }).filter(function(e){return e;})
+            }
+        }else{
+            return null;
+        }
+    }).filter(function(cssEntry){return cssEntry && cssEntry.rules.length > 0})
+
+    //Enable only this for debug dump
+    //.map(function(e){return {href: e.sheet.href, oldsize: e.sheet.cssRules.length, rules: e.rules, css: e.rules.join("\n")} })
+
+    //Enable this for CSS
+    .map(function(cssEntry){ return cssEntry.rules.join(""); })
+    .reduce(function(css,out){return out + css},"")
+    
+    return outCss.replace(/\n/g,"").replace(/content\: \"(.)\"/g,function(a,e){
+        return "content: \"\\" + escape(e).substr(2) + "\"";
+    });
+}
+function saveInlineCSS(callback){
+     var ret = findCriticalCSS(window,document);
+     console.log(ret.length);
+     ret = ret.replace('"\0"','""');
+     ret = ret.replace('"\\"','""');
+     ret += "::-webkit-scrollbar-track { background-color: #fff;}::-webkit-scrollbar {width: 7px;background-color: transparent;}::-webkit-scrollbar-thumb {background-color: #f16e8e;border: 2px solid #fff;}";
+     //ret = "1";
+     $.ajax({
+        url: '/Homes/save_css_inline',
+        type: 'POST',
+        data: {
+            css: ret,
+            controller: controller,
+            action: action,
+        },
+    }).done(function(res) {
+        callback();
+     });
+}
+function rebuildCSSthisPage(){
+    var ua = navigator.userAgent;
+    if(No_Inline == 1 && typeof reBuild == "undefined"  && /Chrome/i.test(ua)){
+        setTimeout(function(){
+            saveInlineCSS(function(){
+                console.log("inline CSS Saved!")
+            });
+        },500);
+    }
+}
+
+function setCookie(key,value,exminutes) 
+{
+    var strValue=JSON.stringify(value);
+    var d = new Date();
+    d.setTime(d.getTime() + exminutes*60*1000);
+    var expires = "expires="+d.toUTCString();
+    document.cookie = key + "=" + strValue + "; " + expires+"; path=/";
+}
+
+function getCookie(key) 
+{
+    var name = key + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) 
+    {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') 
+        {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) 
+        {
+            var strValue= c.substring(name.length, c.length);
+            return JSON.parse(strValue);
+        }
+    }
+    return null;
+}
+function setActive() {
+   var pgurl = /ShoppingCarts/+window.location.href.substr(window.location.href.lastIndexOf("/")+1);
+   $(".left_nav ul li a").each(function(){
+      if($(this).attr("href") == pgurl)
+          $(this).addClass("active");
+  })
+}
+function validateInput(){
+    if (typeof jQuery.validator !== "undefined"){
+        jQuery.validator.addMethod("lettersonly", function(value, element) {
+          return this.optional(element) || /^[a-zA-Z0-9]+$/i.test(value);
+      }, "Letters only please");
+        //validate form đăng ký
+        $(".form-validate").validate();
+    }
+    
+}
+var check = false;
+function chooseRating(){
+    $(".choose-rate").click(function(){
+        if(!$(this).find("img").hasClass('selected')){
+            var val = $(this).data("rate");
+            $('.choose-rate img.selected').each(function(index, el) {
+                console.log('111111111111111');
+                $(this).removeClass('selected');
+                var newSource =$(this).data('alt-src');
+                $(this).data('alt-src', $(this).attr('src'));
+                $(this).attr('src', newSource);
+            });
+            check = true;
+            $(this).find("img").addClass('selected');
+            $("#rate-input").val(val);
+        }
+        else{
+            check = false;
+            $(this).find("img").removeClass('selected');
+            $("#rate-input").val(0);
+        }
+        
+
+        //chuyen mau button 
+        if(($("#content_id").val().length > 4) && check==true){
+            $('.popup-danhgia button').css('background', '#f16e8e');
+        }
+    });
+}
+function countDownBlockVerify(){
+    console.log($(".btn-verify").length);
+    if($(".btn-verify").length > 0){
+        $(".btn-verify").attr("disabled",true);
+        $("#UserCodeVerify").attr("readonly", true);
+        var time = $(".btn-verify").data("blocked");
+        var Int = setInterval(function(){
+            if(time <= 0){
+                clearInterval(Int);
+                $(".btn-verify").text("Xác minh");
+                $(".btn-verify").attr("disabled",false);
+                $("#UserCodeVerify").attr("readonly", false);
+                return true;
+            }
+            $(".btn-verify").text("Vui lòng đợi "+ time+" giây");
+            time = time - 1;
+        }, 1000);
+    }
+}
+function checkoutShowAddNewsAddress(){
+    $(".checkout_info_price input[type='radio']").change(function(){
+        console.log($(this).val());
+        if($(this).val() == "0"){
+            $(".newAddress").slideDown();
+        }
+        else{
+            $(".newAddress").slideUp();
+        }
+    });
+}
+function checkTextboxIsCover(classParrent, Input, classHidden, pixel){
+    $(classParrent).on('focus blur click touchstart', Input, function (event) {
+        if (!isMobile.any()) return;
+        event.stopPropagation();
+        if (event.type == 'click') {
+            $('body').scrollTop(pixel);
+        }
+    });
+}
+function countTimerHomePage(){
+    if($(window).width() < 768) return;
+    //chạy timer ở ngoài trang chủ
+    $('.timer').each(function () {
+        $(this).prop('Counter', $(this).data("from")).animate({
+            Counter: $(this).data("to")
+        }, {
+            duration: 400000,
+            easing: 'swing',
+            step: function (now) {
+                $(this).text(Math.ceil(now));
+            }
+        });
+    });
+}
+/*
+$('input[type=password]').bind('keypress', function (event) {
+    var regex = new RegExp("^[a-zA-Z0-9]+$");
+    var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+//    console.log(key);
+if (!regex.test(key)) {
+   event.preventDefault();
+   return false;
+}
+<<<<<<< HEAD
+});
+*/
+function Readmore(){
+    var showChar = 260;
+    var ellipsestext = "...";
+    var moretext = "Đọc thêm";
+    var lesstext = "Thu lại";
+
+    $('.text-status').each(function() {
+        var content = $(this).html();
+
+        if(content.length > showChar) {
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar, content.length - showChar);
+            var html = c + '<span class="moreellipses">' + ellipsestext+ '</span><span class="morecontent"><span>' + h + '</span><a href="" class="readmorestatus">' + moretext + '</a></span>';
+            $(this).html(html);
+        }
+
+    });
+
+    $(".readmorestatus").click(function(){
+        if($(this).hasClass("less")) {
+            $(this).removeClass("less");
+            $(this).html(moretext);
+        } else {
+            $(this).addClass("less");
+            $(this).html(lesstext);
+        }
+        $(this).parent().prev().toggle();
+        $(this).prev().toggle();
+        return false;
+    });
+}
+function onlyNumber(){
+    $(".only-number").keypress(function (e) {
+     //if the letter is not digit then display error and don't type anything
+     if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+        return false;
+    }
+});
+}
+function checkLink(){
+    if (!isMobile.any()){
+        var all = $(".swiper-slide a");
+        all.each(function(index, el) {
+            var hrefa = $(this).attr('href').trim();
+            var arrHref = hrefa.split('://');
+            if(arrHref[0] == "moki"){
+             $(this).attr('href', "");
+         }
+     });
+    }
+}
+
+function reBuildCSS(){
+    if(typeof reBuild == "undefined" || reBuild != true){
+        return;
+    }
+    //remove inline css old version
+    $("#inlineCSS").remove();
+    setTimeout(function(){
+        saveInlineCSS(function(){
+            if(typeof next != "undefined" && next != -1){
+                window.location.href = "/Homes/save_css_inline/" + next;
+            }
+            else{
+                $("body").html("ALL DONE!");
+            }
+        });
+    },1000);
+}
+
+function lazyLoadSwiper(swiperElement, itemClass){
+	swiperElement.on("slideChangeEnd", function(){
+		$(itemClass + " .lazy").lazyload({
+					// effect: "fadeIn",
+					placeholder     : "https://media.moki.vn/no-image.jpg",
+					failure_limit: 2,
+					skip_invisible: false
+			});
+	});
+}
+$(document).ready(function ()
+{
+    var mqCookie=new MQCookie();
+    var olderUser = mqCookie.getCookie("user");
+    if(typeof MokiUser === "undefined")
+    {
+        if(olderUser!=null) //Logout Event
+        {
+            //console.log("Logout");
+            mqCookie.removeCookie("user");
+            if(window.opener!=undefined&&window.opener!=null)
+            {
+                var data={
+                    type:"onLogout",
+                    user:olderUser,
+                };
+                data = JSON.parse(JSON.stringify(data));
+                window.opener.postMessage(data,"*");
+                window.close();
+            }
+        }
+        else
+        {
+
+        }
+    }
+    else
+    {
+        if(olderUser==null) //Login Event
+        {
+            //console.log("Login 1");
+            mqCookie.setCookie("user",MokiUser,15);
+            if(window.opener!=undefined&&window.opener!=null)
+            {
+                var data={
+                    type:"onLogin",
+                    user:MokiUser,
+                };
+                data = JSON.parse(JSON.stringify(data));
+                window.opener.postMessage(data,"*");
+                window.close();
+            }
+        }
+        else
+        {
+            if(MokiUser.id==olderUser.id)
+            {
+
+            }
+            else //Login Event
+            {
+                //console.log("Login 2");
+                mqCookie.setCookie("user",MokiUser,15);
+                if(window.opener!=undefined&&window.opener!=null)
+                {
+                    var data={
+                        type:"onLogin",
+                        user:MokiUser,
+                    };
+                    data = JSON.parse(JSON.stringify(data));
+                    window.opener.postMessage(data,"*");
+                    window.close();
+                }
+            }
+        }
+    }
+    reBuildCSS();
+});
+var count = 0;
+$(document).ready(function() {
+    var win = $(window);
+    // Each time the user scrolls
+    win.scroll(function() {
+        // End of the document reached?
+        // if ($(document).height() - win.height() == win.scrollTop()) {
+            if(($(window).scrollTop() > 300) && count == 0){
+                $('#loading').show();
+                count++;
+                console.log($(window).scrollTop());
+                $.ajax({
+                    url: '/homes/index',
+                    dataType: 'html',
+                    type : 'POST',
+                    success: function(html) {
+                        $('#item_product').append(html);
+                        $('#loading').hide();
+                        $("#item_product .imgage-news.lazy").lazyload({
+                            // effect: "fadeIn",
+                            placeholder     : "https://media.moki.vn/no-image.jpg",
+                            failure_limit: 2,
+                            skip_invisible: true
+                        });
+                        if((navigator.userAgent.indexOf("MSIE") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
+                        {
+                            $('#item_product').css('padding-top', 70);
+                        }  
+                    }
+                });
+            }
+        });
+
+    setTimeout(function(){
+		if($("#banner_web").length){
+			if (navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0 && ($(window).width() >= 992 && $(window).width() <= 1024)) // 
+			{
+					var win = $(window);
+					var $el = $('#banner_web.banner');
+					var top = $el.offset().top - 130;
+					win.scroll(function() {
+						var bottom = $(".home-bottom-blocks").offset().top - ( $(window).height() - $el.height()) - 200;
+						// alert($(window).scrollTop());
+						if(!$el.hasClass("affix") && $(window).scrollTop() >= top && $(window).scrollTop() < bottom){
+							$el.addClass('affix').css('top', 70);
+						}
+						else if($('.banner').hasClass("affix") && $(window).scrollTop() < top){
+							$el.removeClass('affix').removeClass('affix-top').css('top', 0);
+						}
+						else if($('.banner').hasClass("affix") && $(window).scrollTop() >= bottom){
+							$el.removeClass('affix').addClass('affix-bottom').css('top', bottom - top);
+						}
+					});
+				
+			// alert("Browser is Safari");       
+			}
+			else{
+					$("#banner_web").affix({
+						offset:{
+							top: $("#banner_web").offset().top - 135,
+							bottom: $(document).height() - $(".home-bottom-blocks").offset().top + 50
+						}
+					});
+			}
+		}
+    },2000);
+});
+$(function(){
+  var url = window.location.href; 
+  $(".navi-group .site-nav a").each(function() {
+    if(url == (this.href)) { 
+      $(this).closest("li").addClass("active");
+    }
+  });
+});

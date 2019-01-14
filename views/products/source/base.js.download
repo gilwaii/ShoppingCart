@@ -1,0 +1,96 @@
+TOJSDATA=mqBase64.decode(TOJSDATA);
+TOJSDATA=JSON.parse(TOJSDATA);
+
+(function ($) 
+{
+    var originalVal = $.fn.val;
+    $.fn.val = function(input) 
+    {
+        if (input==undefined) 
+        {
+            var output= originalVal.call(this);
+            if($(this).hasClass("mqPrice"))
+                output=dePrice(output);
+            return output;
+        }
+
+        if($(this).hasClass("mqPrice"))
+        {
+            input=enPrice(input);
+        }
+        return originalVal.call(this,input);
+    };
+})(jQuery);
+
+(function ($) 
+{
+    var originalHtml = $.fn.html;
+    $.fn.html = function(input) 
+    {
+        if(input==undefined) 
+        {
+            var output= originalHtml.call(this);
+            if($(this).hasClass("mqPrice"))
+                output=dePrice(output);
+            return output;
+        }
+        if($(this).hasClass("mqPrice"))
+            input=enPrice(input);
+        return originalHtml.call(this,input);
+    };
+})(jQuery);
+
+function enPrice(price)
+{
+    var intPrice=parseInt(price);
+    if(isNaN(intPrice))
+        return price;
+    var strPrice = price.toString();
+    var newStr = "";
+    var j = 0;
+    for (var i = strPrice.length - 1; i >= 0; i--)
+    {
+        newStr = strPrice.charAt(i) + newStr;
+        j++;
+        if (j == 3)
+        {
+            j = 0;
+            if (i != 0&&strPrice.charAt(i-1)!="-")
+                newStr = "," + newStr;
+        }
+    }
+    return newStr;
+}
+
+function dePrice(strPrice)
+{
+    var newPrice = "";
+    var len = strPrice.length;
+    if(len==0)
+        return "";
+    for (var i = 0; i < len; i++)
+    {
+        var char = strPrice.charAt(i);
+        if (char !== ',')
+            newPrice = newPrice + char;
+    }
+    if(isNaN(parseInt(newPrice)))
+    {
+        return strPrice;
+    }
+    return parseInt(newPrice);
+}
+
+$(document).ready(function ()
+{
+    setTimeout(function ()
+    {
+        $(".mqPrice").keyup(function ()
+        {
+            var value=$(this).val();
+            $(this).val(value);
+        });
+    },200);
+});
+
+

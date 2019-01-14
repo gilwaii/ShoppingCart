@@ -1,0 +1,197 @@
+if(!(typeof MQUrlParams === "function"))
+{
+    function MQUrlParams()
+    {
+        var object=new MQObject();
+        
+        object.getParams=function ()
+        {
+            var href=object.getHref();
+            if(!href.includes("?"))
+                return null;
+            var hrefItemArr=href.split("?");
+            var paramsStr=hrefItemArr[1];
+            var paramStrArr=paramsStr.split("&");
+            for(var i=0;i<paramStrArr.length;i++)
+            {
+                var paramStr=paramStrArr[i];
+                var key=null,value=null;
+                var equalIndex=paramStr.indexOf("=");
+                if(equalIndex<0)
+                {
+                    key=paramStr;
+                    value=null;
+                }
+                else
+                {
+                    key=paramStr.substring(0,equalIndex);
+                    value=paramStr.substring(equalIndex+1,paramStr.length);
+                }
+                
+                if(key=="MQParams")
+                {
+                    if(value!=null)
+                    {
+                        var encodedMqParamsStr=value;
+                        var mqBase64=new MQBase64();
+                        var mqParamsStr=mqBase64.decode(encodedMqParamsStr);
+                        var mqParams=JSON.parse(mqParamsStr);
+                        return mqParams;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        object.getParam=function (key)
+        {
+            var params=object.getParams();
+            if(params==null)
+                return null;
+            if(params[key]==undefined)
+                return null;
+            return params[key];
+        }
+        
+        object.setParam=function(iKey,iValue)
+        {
+            var href=object.getHref();
+            if(!href.includes("?"))
+            {
+                if(iKey==undefined||iValue==undefined)
+                    return ;
+                var mqParams={};
+                mqParams[iKey]=iValue;
+                var mqParamsStr=JSON.stringify(mqParams);
+                var mqBase64=new MQBase64();
+                var encodedMqParamsStr=mqBase64.encode(mqParamsStr);
+                href+="?";
+                href+="MQParams=";
+                href+=encodedMqParamsStr;
+                object.setHref(href);
+                return ;
+            }
+            else
+            {
+                var newHref="";
+                var hrefItemArr=href.split("?");
+                newHref+=hrefItemArr[0]+"?";
+                var paramsStr=hrefItemArr[1];
+                var paramStrArr=paramsStr.split("&");
+                var hasMokiParams=false;
+                for(var i=0;i<paramStrArr.length;i++)
+                {
+                    var paramStr=paramStrArr[i];
+                    var key=null,value=null;
+                    var equalIndex=paramStr.indexOf("=");
+                    if(equalIndex<0)
+                    {
+                        key=paramStr;
+                        value=null;
+                    }
+                    else
+                    {
+                        key=paramStr.substring(0,equalIndex);
+                        value=paramStr.substring(equalIndex+1,paramStr.length);
+                    }
+
+                    if(key=="MQParams")
+                    {
+                        hasMokiParams=true;
+                        var encodedMqParamsStr=value;
+                        var mqBase64=new MQBase64();
+                        var mqParamsStr=mqBase64.decode(encodedMqParamsStr);
+                        var mqParams=JSON.parse(mqParamsStr);
+                        if(iKey==undefined)
+                        {
+                        }
+                        else
+                        {
+                            if(iValue==undefined)
+                            {
+                                delete(mqParams[iKey]);
+                            }
+                            else
+                            {
+                                mqParams[iKey]=iValue;
+                            }
+                            
+                            var mqParamsStr=JSON.stringify(mqParams);
+                            var mqBase64=new MQBase64();
+                            var encodedMqParamsStr=mqBase64.encode(mqParamsStr);
+                            if(i<paramStrArr.length-1)
+                                newHref+="MQParams"+"="+encodedMqParamsStr+"&";
+                            else
+                                newHref+="MQParams"+"="+encodedMqParamsStr;
+                        }
+                    }
+                    else
+                    {
+                        if(i<paramStrArr.length-1)
+                            newHref+=paramStr+"&";
+                        else
+                            newHref+=paramStr;
+                    }
+                }
+                
+                if(!hasMokiParams)
+                {
+                    if(iKey==undefined||iValue==undefined)
+                        return ;
+                    var mqParams={};
+                    mqParams[iKey]=iValue;
+                    var mqParamsStr=JSON.stringify(mqParams);
+                    var mqBase64=new MQBase64();
+                    var encodedMqParamsStr=mqBase64.encode(mqParamsStr);
+                    newHref+="&";
+                    newHref+="MQParams=";
+                    newHref+=encodedMqParamsStr;
+                    object.setHref(newHref);
+                }
+                object.setHref(newHref);
+            }
+        }
+        
+        object.makeUrl=function (url,mqParams)
+        {
+            var mqParamsStr=JSON.stringify(mqParams);
+            var mqBase64=new MQBase64();
+            var encodedMqParamsStr=mqBase64.encode(mqParamsStr);
+            if(url.includes("?"))
+            {
+                url+="&";
+                url+="MQParams=";
+                url+=encodedMqParamsStr;
+            }
+            else
+            {
+                url+="?";
+                url+="MQParams=";
+                url+=encodedMqParamsStr;
+            }
+            return url;
+        }
+        
+        object.remove=function(key)
+        {
+            object.setParam(key,undefined);
+        }
+        
+        object.clear=function ()
+        {
+            object.setParam(undefined,undefined);
+        }
+        
+        object.getHref=function ()
+        {
+            return window.location.href;
+        }
+        
+        object.setHref=function(href)
+        {
+            history.replaceState("xxx",document.title,href);
+        }
+        
+        return object;
+    }
+}

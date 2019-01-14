@@ -1,0 +1,17 @@
+if(!(typeof MQMath === "function"))
+{
+    function MQMath()
+    {
+        var object=new MQObject();
+        
+        object.calPercent = function (num1,num2,length)
+        {
+            if(length==null||length==undefined)
+                length=2;
+            var d=Math.pow(10,length+2);
+            return Math.round(num1*d/num2)/100;
+        }
+        
+        return object;
+    }
+}

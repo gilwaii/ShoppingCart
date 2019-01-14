@@ -1,0 +1,466 @@
+<!--CONTENT-->
+    <div class="background" style="
+    background-color: white;
+">
+        <div class="container ng-scope" ng-controller="ShoppingCartController">
+            <div class="row">
+                <div class="fix-products">
+                    <!--Menu-->
+                    <div class="page-container" id="PageContainer">
+                        <main class="main-content" id="MainContent" role="main">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="home-left-sidebar col-md-3 col-lg-3 hidden-xs hidden-sm">
+                                        <div id="shopify-section-home-left-sidebar" class="shopify-section">
+                                            <div class="group_left all-collections hidden-xs hidden-sm">
+                                                <div class="shopby-collections">
+                                                    <div class="shopby-title">
+                                                        <i class="fa fa-list"></i><span>Danh mục sản phẩm</span>
+                                                    </div>
+                                                    <div class="navbar-default fix-menu" role="navigation">
+                                                        <div class="sidebar-nav">
+                                                            <ul class="shopy-content nav fiv-nav-color" id="side-body">
+                                                                {{# each categories}}
+                                                                <li>
+                                                                    <a class="title-text" href="/categories/{{this._id}}">
+                                                                        <h4>{{this.name}}</h4>
+                                                                    </a>
+                                                                </li>
+                                                                {{/each}}
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="group_left bestseller">
+                                                <div class="bestseller-content">
+                                                    <div class="left-title section-header">
+                                                        <h2>Sản phẩm mới nhất</h2>
+                                                    </div>
+                                                    <ul class="left-content best-slider owl-carousel owl-theme" style="display: block; opacity: 1;">
+                                                        <div class="owl-wrapper-outer">
+                                                            <div class="owl-wrapper" style="display: block; width: 586px; left: 0px; transition: all 1000ms ease 0s; transform: translate3d(0px, 0px, 0px);">
+                                                                <div class="owl-item" style="width: 293px;">
+                                                                    <div class="product-item-wrapper">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="owl-controls clickable" style="display: none;">
+                                                            <div class="owl-buttons">
+                                                                <div class="owl-prev"><i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i></div>
+                                                                <div class="owl-next"><i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i></div>
+                                                            </div>
+                                                        </div>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <section id="product-detail" product-id="9399">
+                                        <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+                                            <div class="row">
+                                                <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12 fix-heght">
+                                                    <div class="product-image-one col-xs-12">
+                                                        <div class="row">
+                                                            <section class="slider-for slider slick-initialized slick-slider">
+                                                                <div aria-live="polite" class="slick-list draggable">
+                                                                    <div class="slick-track" role="listbox" style="opacity: 1; width: 409px;">
+                                                                        <div class="item full slick-slide slick-current slick-active" data-slick-index="0" aria-hidden="false" tabindex="-1" role="option" aria-describedby="slick-slide00" style="width: 409px; position: relative; left: 0px; top: 0px; z-index: 999; opacity: 1;">
+                                                                            <a id="Zoom-3" data-options="selectorTrigger: hover;" class="MagicZoom mz-thumb-selected" href="{{product.image}}" tabindex="0">
+                                                                                <figure class="mz-figure mz-hover-zoom mz-ready"><img class="img-responsive" src="{{product.image}}" alt="Moki.vn - Ứng dụng mua bán trên di động | {{product.name}}" style="max-width: 640px; max-height: 640px;">
+                                                                                    <div class="mz-lens" style="top: 0px; transform: translate(-10000px, -10000px); width: 175px; height: 175px;"><img src="{{product.image}}" style="position: absolute; top: 0px; left: 0px; width: 409px; height: 409px; transform: translate(-140px, -1px);"></div>
+                                                                                    <div class="mz-loading"></div>
+                                                                                    <div class="mz-hint mz-hint-hidden"><span class="mz-hint-message">Click to expand</span></div>
+                                                                                </figure>
+                                                                            </a>
+                                                                            <figcaption class="social">
+                                                                                <a href="https://www.facebook.com/sharer/sharer.php?u=https://moki.vn/san-pham/THIA-THAY-CHO-BINH-LOVI-2588-9399.html" class="readmore_btn icon icon-facebook" tabindex="0"></a>
+                                                                                <a href="https://twitter.com/share?status=https://moki.vn/san-pham/THIA-THAY-CHO-BINH-LOVI-2588-9399.html" class="readmore_btn icon icon icon-twitter" tabindex="0"></a>
+                                                                                <a href="https://plus.google.com/share?url=https://moki.vn/san-pham/THIA-THAY-CHO-BINH-LOVI-2588-9399.html" class="readmore_btn icon icon icon-gplus" tabindex="0"></a>
+                                                                            </figcaption>
+
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                            </section>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                                                    <div class="row">
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <h2 class="name">{{product.name}}</h2>
+                                                            <div class="rate">
+                                                                <input type="range" value="4.5" step="0.5" id="backing4" style="display: none;">
+                                                                <div class="rateit bigstars" data-rateit-backingfld="#backing4" data-rateit-resetable="false" data-rateit-ispreset="true" data-rateit-min="0" data-rateit-max="5" data-id="9399" data-type="products">
+                                                                    <button id="rateit-reset-2" type="button" data-role="none" class="rateit-reset" aria-label="reset rating" aria-controls="rateit-range-2" style="display: none;"></button>
+                                                                    <div id="rateit-range-2" class="rateit-range" tabindex="0" role="slider" aria-label="rating" aria-owns="rateit-reset-2" aria-valuemin="0" aria-valuemax="5" aria-valuenow="4.5" aria-readonly="false" style="width: 80px; height: 16px;">
+                                                                        <div class="rateit-selected rateit-preset" style="height: 16px; width: 72px; display: block;"></div>
+                                                                        <div class="rateit-hover" style="height: 16px; display: none; width: 0px;"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <p class="prices">
+                                                                <span>{{product.price}}đ</span>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-sm-3 col-xs-3">
+                                                            <div style="border-bottom: 1px solid #d9d9da;line-height: 0;"></div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <p class="detail" style="text-overflow: ellipsis;overflow: hidden;">Sản phẩm bán từ shop:
+                                                                <a href="{{seller.url}}">
+                                                                    <span>{{seller.name}}</span>
+                                                                </a>
+                                                            </p>
+                                                            <p class="detail">Điểm uy tín shop:
+                                                                <span>5</span>
+                                                            </p>
+                                                            <p class="detail">Số sản phẩm:
+                                                                <span>{{seller.numProduct}}</span>
+                                                            </p>
+                                                            <p class="detail">Ngày tham gia:
+                                                                <span>{{seller.created}}</span>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <div style="border-bottom: 1px solid #d9d9da;line-height: 0;"></div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <p class="detail"><i class="fa fa-bullseye"></i>Trạng thái:
+                                                                <span>Mới</span>
+                                                            </p>
+                                                            <p class="detail"><i class="fa fa-folder"></i>Thuộc danh mục:
+                                                                <a href="/categories/{{idCate}}">
+                                                                    <span>
+                                    {{nameCate}}                                </span>
+                                                                </a>
+                                                            </p>
+
+
+
+                                                            <p class="detail" style="text-overflow: ellipsis;overflow: hidden;">
+                                                                <i class="fa fa-tags"></i>Tag:
+                                                                </p>
+                                                        </div>
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <div id="buyBt" class="readmore_btn" ng-click="buy()" data-userid=""><a href="/add-to-cart/{{product._id}}">MUA NGAY</a></div>
+                                                            <button id="buyDialogBt" data-toggle="modal" data-target="#download" hidden=""></button>
+                                                            <input id="jsonI" hidden="" value="{&quot;Product&quot;:{&quot;id&quot;:&quot;9399&quot;,&quot;name&quot;:&quot;TH\u00ccA THAY CHO B\u00ccNH LOVI 2\/588&quot;,&quot;price&quot;:&quot;45000&quot;,&quot;price_discount&quot;:&quot;45000&quot;,&quot;discount_value&quot;:null,&quot;offers&quot;:&quot;0&quot;,&quot;can_buy&quot;:&quot;-4&quot;,&quot;is_blocked&quot;:&quot;0&quot;},&quot;User&quot;:{&quot;username&quot;:&quot;Momo Shop&quot;,&quot;url&quot;:&quot;momo&quot;},&quot;ProductOtherImage&quot;:[{&quot;id&quot;:&quot;19941&quot;,&quot;product_id&quot;:&quot;9399&quot;,&quot;image&quot;:&quot;files\/product\/images\/320s\/399256c3cbd78707534ac95fec9cee1a.jpg&quot;,&quot;sort&quot;:&quot;0&quot;,&quot;created&quot;:&quot;2017-01-03 11:36:35&quot;,&quot;modified&quot;:&quot;2017-01-03 11:36:35&quot;}]}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row product-boxs">
+                                                <div class="col-sm-12 col-xs-12">
+                                                    <div class="row">
+                                                        <div class="col-sm-12 col-xs-12">
+                                                            <div class="box">
+                                                                <div class="border-bottom-box">
+                                                                    <div data-role="tabs">
+                                                                        <div class="tab-nav">
+                                                                            <ul role="tablist">
+                                                                                <li class="active"><a href="#tabs-1" role="tab" data-toggle="tab">Mô tả sản phẩm</a></li>
+                                                                                <li><a href="#tabs-2" role="tab" data-toggle="tab">Đánh giá/ phản hồi</a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                        <div class="col-sm-12 col-xs-12 content-text tab-content">
+                                                                            <div class="tab-item tab-pane active fade in" id="tabs-1" role="tabpanel">
+                                                                                {{product.described}}
+                                                                            </div>
+                                                                            <div class="tab-item tab-pane fade in" id="tabs-2" role="tabpanel">
+                                                                                <div class="post-comment">
+                                                                                    <div id="commentDiv">
+                                                                                        <p class="no-comments">Chưa có bình luận</p>
+                                                                                    </div>
+                                                                                    <button id="commentReadMoreBt" type="button" class="btn btn-danger btn-sm" style="margin: 20px 0px; display: none;" product-id="9399">Xem thêm</button>
+                                                                                    <p class="section">Viết bình luận:</p>
+                                                                                    <input type="hidden" id="productID" value="9399">
+                                                                                    <input type="hidden" id="productName" value="{{product.name}}">
+                                                                                    <div class="comment-form">
+                                                                                        <div class="avatar-me">
+                                                                                            <img src="./source/avatar.png">
+                                                                                        </div>
+                                                                                        <div class="box-comment">
+                                                                                            <textarea name="" class="input-comment" cols="30" rows="10" placeholder="Ý kiến của bạn..." data-parent-id="0"></textarea>
+                                                                                            <div>
+                                                                                                <button class="btn btn-sm send-comment">Gửi</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ajax-same-user">
+                                                        <div class="row">
+                                                            <div class="col-sm-12 col-xs-12">
+                                                                <div class="box">
+                                                                    <div class="border-bottom-box">
+                                                                        <div class="tab-nav">
+                                                                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 ">
+                                                                                <p class="detail">Các sản phẩm bán từ shop:
+                                                                                    <a href="{{seller.url}}">
+                                                                                        <span>{{seller.name}}</span>
+                                                                                    </a>
+                                                                                </p>
+                                                                            </div>
+                                                                            <div class="hidden-xs col-sm-2 col-xs-2">
+                                                                                <div class="nut">
+                                                                                    <div class="prev icon-left-open prev-1 slick-arrow" style="display: flex;"></div>
+                                                                                    <div class="next icon-right-open next-1 slick-arrow" style="display: flex;"></div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="col-sm-12 col-xs-12 content-text">
+                                                                            <div class="multiple-items slick-with-lazy row slick-initialized slick-slider">
+                                                                                <div aria-live="polite" class="slick-list draggable">
+                                                                                    <div class="slick-track" role="listbox" style="opacity: 1; width: 3392px; transform: translate3d(-848px, 0px, 0px);">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ajax-same-category">
+                                                        <div class="row">
+                                                            <div class="col-sm-12 col-xs-12">
+                                                                <div class="box">
+                                                                    <div class="border-bottom-box">
+                                                                        <div class="col-sm-12 col-xs-12 tab-nav">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                                                                                    <p class="detail">Các sản phẩm cùng danh mục</p>
+                                                                                </div>
+                                                                                <div class="hidden-xs col-lg-2 col-md-2 col-sm-2">
+                                                                                    <div class="nut">
+                                                                                        <div class="prev icon-left-open prev-2 slick-arrow" style="display: flex;"></div>
+                                                                                        <div class="next icon-right-open next-2 slick-arrow" style="display: flex;"></div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <div class="col-sm-12 col-xs-12 content-text">
+                                                                            <div class="multiple-items1 slick-with-lazy row slick-initialized slick-slider">
+
+
+
+
+
+
+
+
+                                                                                <div aria-live="polite" class="slick-list draggable">
+                                                                                    <div class="slick-track" role="listbox" style="opacity: 1; width: 3392px; transform: translate3d(-848px, 0px, 0px);">
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+                                </div>
+                            </div>
+                        </main>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal -->
+            <!--modal tablet-->
+            <!--end modal tablet-->
+        </div>
+    </div>
+    <!-- popup -->
+    <!--end-->
+    <script>
+        function myFunction() {
+            $("#email").val('');
+        }
+    </script>
+    <div class="snippets">
+        <div itemscope="" itemtype="http://schema.org/Product">
+            <span itemprop="name">{{product.name}}. Giá: {{product.price}}đ</span>
+            <div itemprop="aggregateRating" itemscope="" itemtype="http://schema.org/AggregateRating">
+                <span itemprop="ratingValue">4.5</span>
+                <span itemprop="bestRating">5</span>
+                <span itemprop="reviewCount">102</span>
+            </div>
+        </div>
+
+
+    </div>
+    <div style="clear:both;"></div>
+    <script>
+        var PATHNAME = window.location.pathname;
+
+        var TOJSDATA = 'W10=';
+
+        var Router = {
+            controller: "Products",
+            action: "details",
+            pass: "9399",
+        };
+        Router.controller = Router.controller.toLowerCase();
+        Router.action = Router.action.toLowerCase();
+    </script>
+
+
+    <script>
+        var loadDeferredStyles = function() {
+            var addStylesNode = document.getElementById("deferred-styles");
+            var replacement = document.createElement("div");
+            replacement.innerHTML = addStylesNode.textContent;
+            document.body.appendChild(replacement)
+            addStylesNode.parentElement.removeChild(addStylesNode);
+        };
+        var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+            webkitRequestAnimationFrame || msRequestAnimationFrame;
+        if (raf) raf(function() {
+            window.setTimeout(loadDeferredStyles, 0);
+        });
+        else window.addEventListener('load', loadDeferredStyles);
+    </script>
+
+
+    <script type="text/javascript" src="./source/jquery-2.1.0.min.js.download"></script>
+    <script type="text/javascript" src="./source/sb-admin-2.js.download"></script>
+    <script type="text/javascript" src="./source/metisMenu.min.js.download"></script>
+    <script type="text/javascript" src="./source/jQuery.scrollSpeed.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.dotdotdot.min.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.lazyload.min.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.parallax-1.1.3.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.parallax-scroll.js.download"></script>
+    <script type="text/javascript" src="./source/bootstrap.min.js.download"></script>
+    <script type="text/javascript" src="./source/slick.min.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.countTo.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.rateit.min.js.download"></script>
+    <script type="text/javascript" src="./source/toastr.js.download"></script>
+    <script type="text/javascript" src="./source/bootbox.min.js.download"></script>
+    <script type="text/javascript" src="./source/swiper.min.js.download"></script>
+    <script type="text/javascript" src="./source/angular.min.js.download"></script>
+    <script type="text/javascript" src="./source/socket.io.js.download"></script>
+    <script type="text/javascript" src="./source/chatbox.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.mousewheel-3.0.6.pack.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.fancybox.pack.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.fancybox-buttons.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.fancybox-media.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.fancybox-thumbs.js.download"></script>
+    <script type="text/javascript" src="./source/mq_object.js.download"></script>
+    <script type="text/javascript" src="./source/mq_date.js.download"></script>
+    <script type="text/javascript" src="./source/mq_base64.js.download"></script>
+    <script type="text/javascript" src="./source/mq_cookie.js.download"></script>
+    <script type="text/javascript" src="./source/mq_math.js.download"></script>
+    <script type="text/javascript" src="./source/mq_url_params.js.download"></script>
+    <script type="text/javascript" src="./source/base.js.download"></script>
+    <script type="text/javascript" src="./source/myscript.js.download"></script>
+    <script type="text/javascript" src="./source/shoppingcart.js.download"></script>
+    <script type="text/javascript" src="./source/lightgallery.js.download"></script>
+    <script type="text/javascript" src="./source/lg-fullscreen.js.download"></script>
+    <script type="text/javascript" src="./source/lg-thumbnail.js.download"></script>
+    <script type="text/javascript" src="./source/lg-video.js.download"></script>
+    <script type="text/javascript" src="./source/lg-autoplay.js.download"></script>
+    <script type="text/javascript" src="./source/lg-zoom.js.download"></script>
+    <script type="text/javascript" src="./source/lg-hash.js.download"></script>
+    <script type="text/javascript" src="./source/lg-pager.js.download"></script>
+    <script type="text/javascript" src="./source/video.js.download"></script>
+    <script type="text/javascript" src="./source/magiczoomplus.js.download"></script>
+    <script type="text/javascript" src="./source/prettify.min.js.download"></script>
+    <script type="text/javascript" src="./source/scripts75db.js.download"></script>
+    <script type="text/javascript" src="./source/option_selection.js.download"></script>
+    <script type="text/javascript" src="./source/imagesloaded.pkgd.min75db.js.download"></script>
+    <script type="text/javascript" src="./source/owl.carousel.min75db.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.zoom75db.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.fancybox75db.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.vimeo.api75db.js.download"></script>
+    <script type="text/javascript" src="./source/modernizr75db.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.smooth-scroll.min75db.js.download"></script>
+    <script type="text/javascript" src="./source/classie75db.js.download"></script>
+    <script type="text/javascript" src="./source/cs-hellobaby.script75db.js.download"></script>
+    <script type="text/javascript" src="./source/currencies.js.download"></script>
+    <script type="text/javascript" src="./source/jquery.currencies.min75db.js.download"></script>
+    <script type="text/javascript" src="./source/linkOptionSelectors75db.js.download"></script>
+    <script type="text/javascript" src="./source/scripts.js.download"></script>
+    <script type="text/javascript" src="./source/vendor75db.js.download"></script>
+    <script type="text/javascript" src="./source/theme75db.js.download"></script>
+    <script type="text/javascript" src="./source/shopify_stats1bce.js.download"></script>
+
+
+
+    <script>
+        window.onload = function() {
+            $("#orderBt").click(function() {
+                window.location = "/ShoppingCarts";
+            });
+            $("#orderBtMobile").click(function() {
+                window.location = "/ShoppingCarts";
+            });
+
+        }
+        $(document).ready(function() {
+            $(".fancybox-thumb").fancybox({
+                prevEffect: 'none',
+                nextEffect: 'none',
+                helpers: {
+                    title: {
+                        type: 'outside'
+                    },
+                    thumbs: {
+                        width: 50,
+                        height: 50
+                    }
+                }
+            });
+        });
+    </script>
+    <div class="magic-hidden-wrapper">
+        <div style="display: none; visibility: hidden;">mgctlbxN$MZP mgctlbxV$5.2.1 mgctlbxL$T</div>
+        <div class="mz-zoom-window" style="top: -100000px; width: 409px; height: 409px; left: 826px;"><img src="{{product.image}}"></div>
+    </div>
+    <div>
+
+        <link rel="stylesheet" type="text/css" href="./source/bootstrap.min.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/normalize.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/animate.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/slick.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/slick-theme.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/font-awesome.min.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/style.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/chatbox.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/style_product.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/rateit.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/style_cart.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/jquery.fancybox.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/jquery.fancybox-buttons.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/jquery.fancybox-thumbs.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/swiper.min.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/lightgallery.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/video-js.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/magiczoomplus.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/prettify.min.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/owl.carousel75db.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/cs-hellobaby.global.scss75db.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/cs-hellobaby.styles.scss75db.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/styles75db.css" async="1">
+        <link rel="stylesheet" type="text/css" href="./source/spr.css" async="1">
+    </div>
+</body>
+
+</html>

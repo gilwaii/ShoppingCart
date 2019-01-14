@@ -1,0 +1,718 @@
+    /*# sourceMappingURL=style.css.map */
+    /*CHATBOX*/
+
+    .hienra {
+        bottom: 0 !important;
+    }
+    .chatbox {
+        width: 350px;
+        height: 530px;
+        background: url(../img/chat_bg.png);
+        position: fixed;
+        bottom: -100%;
+        right: 145px;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        z-index: 998;
+        -webkit-transform: translate3d(0, 0, 0);
+        -o-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        -webkit-overflow-scrolling: touch;
+    }
+    .chatbox p {
+        font-family: 'segoe ui', 'arial', sans-serif;
+        font-weight: 500;
+        margin: 0px;
+    }
+    .nhanvien {
+        position: fixed;
+        right: 10px;
+        bottom: 0;
+        z-index: 999;
+        cursor: pointer;
+    }
+    .nhanvien.hidetobuttom {
+        bottom: -250px;
+    }
+    .chatbox .like,
+    .chatbox .dislike {
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .chatbox .like.active,
+    .chatbox .dislike.active {
+        color: #f05077;
+    }
+    .chatbox .dislike {
+        -ms-transform: rotate(180deg);
+        /* IE 9 */
+        
+        -webkit-transform: rotate(180deg);
+        /* Chrome, Safari, Opera */
+        
+        transform: rotate(180deg);
+        margin-left: 10px;
+        border-right: 1px solid #585858;
+        padding: 0px 10px 0px 0px;
+    }
+    .chatbox .head {
+        width: 100%;
+        height: 50px;
+        background: #ff789e;
+        box-shadow: 0 1 2px #b9b9b9;
+        padding: 5px 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+    }
+    .chatbox .head .title {
+        color: #fff;
+        padding-left: 35px;
+        position: relative;
+        font-family: 'segoe ui', 'arial', sans-serif;
+        font-size: 13px;
+        font-weight: 400;
+    }
+    .chatbox .head .title:after {
+        content: '';
+        width: 40px;
+        height: 37px;
+        background: url(../img/fa-envelope.png) center no-repeat;
+        position: absolute;
+        top: -10px;
+        left: 0;
+    }
+    .chatbox .head p.online:after {
+        background: url(../img/dot.png) center no-repeat;
+    }
+    .chatbox .sub-heading {
+        padding: 10px 0px;
+        overflow: hidden;
+        height: 85px;
+        background: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    .chatbox .sub-heading img:first-child {
+        float: left;
+        margin-right: 10px;
+        width: 75px;
+        border-radius: 1000px;
+    }
+    .chatbox .sub-heading img:last-child {
+        float: right;
+        margin-left: 15px;
+        transform: translateY(22px);
+    }
+    .chatbox .sub-heading .text {
+        float: left;
+        transform: translateY(18px);
+    }
+    .chatbox .sub-heading .text p {
+        font-family: 'segoe ui', 'arial', sans-serif;
+        line-height: 18px;
+    }
+    .chatbox .sub-heading .text p:first-child {
+        font-size: 14px;
+        text-transform: uppercase;
+        color: #f05077;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .chatbox .sub-heading .text p:last-child {
+        font-size: 11px;
+        color: #676767;
+    }
+    .chatbox .content {
+        padding: 10px 25px;
+        max-height: calc(100% - 50px);
+        color: rgba(255, 255, 255, 0.7);
+        overflow: auto;
+        position: absolute;
+    }
+    .chatbox .content p {
+        font-size: 12px;
+        line-height: 23px;
+        font-weight: 400;
+        margin-bottom: 10px;
+        color: #1c1c1c;
+    }
+    .chatbox .content::-webkit-input-placeholder {
+        color: #1c1c1c;
+        opacity: 0.7;
+    }
+    .chatbox .content form input,
+    .chatbox .content form textarea,
+    .chatbox .content form button {
+        width: 100%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.55);
+        border: none;
+        margin-bottom: 13px;
+        font-family: 'segoe ui', 'arial', sans-serif;
+        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+        font-size: 12px;
+        padding: 0 20px;
+        color: #f05077;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .chatbox .content form input:focus,
+    .chatbox .content form textarea:focus{
+        color: #f05077;
+        outline: none;
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
+    }
+    .chatbox .content form textarea {
+        height: 175px;
+        resize: none;
+        padding-top: 10px;
+    }
+    .chatbox .content form button {
+        width: 100%;
+        height: 50px;
+        cursor: pointer;
+        color: #fff;
+        background: #f05077;
+        box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+        font-family: 'segoe ui', 'arial', sans-serif;
+        font-size: 11px;
+    }
+    .chatbox .content form button:hover {
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
+    }
+    .chatbox .content .form_1 {
+        margin-top: 50px;
+    }
+    .chatbox .content .form_1 input,
+    .chatbox .content .form_1 textarea,
+    .chatbox .content .form_1 button {
+        height: 50px;
+    }
+    .chatbox .content .form_1 span {
+        font-family: 'segoe ui', 'arial', sans-serif;
+        font-size: 11px;
+        color: #1c1c1c;
+        display: inline-block;
+        margin: 23px 0 10px;
+        font-weight: 500;
+        transform: translateY(-11px);
+        margin-right: 15px;
+    }
+    .typing
+    {
+        clear: both;
+        margin-top:225px;
+    }
+    
+
+    .chatbox i{
+        height: 20px;
+        font-size: 12px
+    }
+
+    .chatbox .conversation .content_online div:last-child {
+        margin-bottom: 6px;
+    }
+    .chatbox .conversation .content_online .text-content,
+    .chatbox .conversation .content_online .text-content-user {
+        background: rgba(255, 255, 255, 0.55);
+        box-shadow: 0 0 7px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        padding: 10px 15px;
+        margin-left: 60px;
+        margin-right: 60px;
+        margin-top: 6px;
+        position: relative;
+        float: left;
+        display: table;
+        clear: both;
+        word-break: break-word;
+    }
+    .chatbox .conversation .content_online .text-content p,
+    .chatbox .conversation .content_online .text-content-user p {
+        font-family: 'segoe ui', 'arial', sans-serif;
+        font-size: 12px;
+        line-height: 19px;
+        font-weight: 400;
+        /*//letter-spacing: 0.05em;*/
+        color: #333;
+        display: block;
+    }
+    .chatbox .conversation .content_online .text-content p:first-child,
+    .chatbox .conversation .content_online .text-content-user p:first-child {
+        color: #f05077;
+        opacity: 1;
+    }
+    .chatbox .conversation .content_online .text-content:after,
+    .chatbox .conversation .content_online .text-content-user:after {
+        content: '';
+        width: 50px;
+        height: 50px;
+        background: url(../img/AVATAR%20SMALL.png);
+        position: absolute;
+        top: 0;
+        left: -60px;
+    }
+    .chatbox .conversation .content_online .text-content:before,
+    .chatbox .conversation .content_online .text-content-user:before {
+        content: '';
+        border-width: 7px;
+        border-style: solid;
+        border-color: transparent rgba(255, 255, 255, 0.55) transparent transparent;
+        position: absolute;
+        top: 10px;
+        left: -14px;
+    }
+    .chatbox .conversation .content_online .text-content-user {
+        /*margin-left: 10px;*/
+        margin-right: 50px;
+        float: right;
+    }
+    .chatbox .conversation .content_online .text-content-user:after {
+        content: '';
+        width: 50px;
+        height: 50px;
+        background: url(../img/AVATAR%20SMALL.png);
+        position: absolute;
+        top: 0;
+        left: calc(100% + 10px);
+    }
+    .chatbox .conversation .content_online .text-content-user:before {
+        content: '';
+        border-width: 7px;
+        border-style: solid;
+        border-color: transparent transparent transparent rgba(255, 255, 255, 0.55);
+        position: absolute;
+        top: 10px;
+        left: calc(100% + 0px);
+    }
+    .chatbox .conversation .content_online .text-content-user p {
+        text-align: left;
+    }
+    .chatbox .bottom {
+        background: #34495e;
+        width: 100%;
+    }
+    .chatbox .bottom textarea {
+        width: 100%;
+        height: 70px;
+        background: #f05077;
+        font-family: 'segoe ui', 'arial', sans-serif;
+        /*box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.15);*/
+        font-size: 12px;
+        padding: 16px 25px;
+        /*transition: all 0.3s ease;*/
+        position: absolute;
+        bottom: 0px;
+        border: none;
+        color: #fff;
+        resize: none;
+    }
+    .chatbox .bottom textarea:focus {
+        color: #fff;
+        outline: none;
+        border: none;
+        /*box-shadow: 0 3px 5px #202d3b;*/
+    }
+    .chatbox_2 {
+        right: 400px;
+    }
+    .chatbox_3 {
+        right: 800px;
+    }
+}
+.scrollToTop {
+    width: 45px;
+    height: 44px;
+    position: fixed;
+    right: 5px;
+    bottom: 200px;
+    display: none;
+    z-index: 998;
+    background: #ff789e;
+    box-shadow: 0 3px 0 #b91635;
+    color: #fff;
+    -moz-transition: all 0.3s ease-out;
+    -o-transition: all 0.3s ease-out;
+    -webkit-transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
+    cursor: pointer;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-content: center;
+    -ms-flex-line-pack: center;
+    align-content: center;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transform: translateY(11px);
+    transform: translateY(11px);
+    border-radius: 7px;
+    z-index: 999;
+}
+.scrollToTop.hidetobuttom {
+    bottom: 65px;
+}
+.scrollToTop i {
+    color: #fff;
+    font-size: 20px;
+}
+/*# sourceMappingURL=style.css.map */
+/*CHATBOX*/
+
+.hienra {
+    bottom: 0 !important;
+}
+.chatbox {
+    width: 320px;
+    height: 530px;
+    background: url(../img/chat_bg.png);
+    position: fixed;
+    bottom: -100%;
+    right: 145px;
+    transition: all 0.2s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    z-index: 998;
+    background-size: cover;
+}
+.chatbox p {
+    font-family: 'segoe ui', 'arial', sans-serif;
+    font-weight: 500;
+    margin: 0px;
+}
+.nhanvien {
+    position: fixed;
+    right: 10px;
+    bottom: 0;
+    z-index: 999;
+    cursor: pointer;
+}
+.chatbox .hieuung {
+    right: 0;
+    width: 100%;
+    height: 430px;
+}
+.nhanvien.hidetobuttom {
+    bottom: -250px;
+}
+.chatbox .like,
+.chatbox .dislike {
+    font-size: 16px;
+    cursor: pointer;
+}
+.chatbox .like.active,
+.chatbox .dislike.active {
+    color: #f05077;
+}
+.chatbox .dislike {
+    -ms-transform: rotate(180deg);
+    /* IE 9 */
+    
+    -webkit-transform: rotate(180deg);
+    /* Chrome, Safari, Opera */
+    
+    transform: rotate(180deg);
+    margin-left: 10px;
+    border-right: 1px solid #585858;
+    padding: 0px 10px 0px 0px;
+}
+.chatbox .head {
+    width: 100%;
+    height: 50px;
+    background: #ff789e;
+    box-shadow: 0 1 2px #b9b9b9;
+    padding: 5px 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.chatbox .head .title {
+    color: #fff;
+    padding-left: 35px;
+    position: relative;
+    font-family: 'segoe ui', 'arial', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+}
+.chatbox .head .title:after {
+    content: '';
+    width: 40px;
+    height: 37px;
+    background: url(../img/fa-envelope.png) center no-repeat;
+    position: absolute;
+    top: -10px;
+    left: 0;
+}
+.chatbox .head p.online:after {
+    background: url(../img/dot.png) center no-repeat;
+}
+.chatbox .sub-heading {
+    padding: 10px 0px;
+    overflow: hidden;
+    height: 85px;
+    background: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+.chatbox .sub-heading img:first-child {
+    float: left;
+    margin-right: 10px;
+    width: 75px;
+    border-radius: 1000px;
+}
+.chatbox .sub-heading img:last-child {
+    float: right;
+    margin-left: 15px;
+    transform: translateY(22px);
+}
+.chatbox .sub-heading .text {
+    float: left;
+    transform: translateY(18px);
+}
+.chatbox .sub-heading .text p {
+    font-family: 'segoe ui', 'arial', sans-serif;
+    line-height: 18px;
+}
+.chatbox .sub-heading .text p:first-child {
+    font-size: 14px;
+    text-transform: uppercase;
+    color: #f05077;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+.chatbox .sub-heading .text p:last-child {
+    font-size: 11px;
+    color: #676767;
+}
+.chatbox .content {
+    padding: 10px 25px;
+    max-height: calc(100% - 50px);
+    color: rgba(255, 255, 255, 0.7);
+    overflow: auto;
+    position: absolute;
+}
+.chatbox .content p {
+    font-size: 12px;
+    line-height: 23px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    color: #1c1c1c;
+}
+.chatbox .content::-webkit-input-placeholder {
+    color: #1c1c1c;
+    opacity: 0.7;
+}
+.chatbox .content form input,
+.chatbox .content form textarea,
+.chatbox .content form button {
+    width: 100%;
+    height: 35px;
+    background: rgba(255, 255, 255, 0.55);
+    border: none;
+    margin-bottom: 13px;
+    font-family: 'segoe ui', 'arial', sans-serif;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+    font-size: 12px;
+    padding: 0 20px;
+    color: #f05077;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+}
+.chatbox .content form input:focus,
+.chatbox .content form textarea:focus {
+    color: #f05077;
+    outline: none;
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
+}
+.chatbox .content form textarea {
+    height: 175px;
+    resize: none;
+    padding-top: 10px;
+}
+.chatbox .content form button {
+    width: 100%;
+    height: 50px;
+    cursor: pointer;
+    color: #fff;
+    background: #f05077;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.15);
+    font-family: 'segoe ui', 'arial', sans-serif;
+    font-size: 11px;
+}
+.chatbox .content form button:hover {
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.25);
+}
+.chatbox .content .form_1 {
+    margin-top: 50px;
+}
+.chatbox .content .form_1 input,
+.chatbox .content .form_1 textarea,
+.chatbox .content .form_1 button {
+    height: 50px;
+}
+.chatbox .content .form_1 span {
+    font-family: 'segoe ui', 'arial', sans-serif;
+    font-size: 11px;
+    color: #1c1c1c;
+    display: inline-block;
+    margin: 23px 0 10px;
+    font-weight: 500;
+    transform: translateY(-11px);
+    margin-right: 15px;
+}
+.typing
+{
+    clear: both;
+    margin-top:225px;
+}
+
+
+.chatbox i{
+    height: 20px;
+    font-size: 12px
+}
+.chatbox .conversation{
+    height: 235px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+.chatbox .conversation .content_online div:last-child {
+    margin-bottom: 6px;
+}
+.chatbox .conversation .content_online .text-content,
+.chatbox .conversation .content_online .text-content-user {
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-right: 60px;
+    margin-left: 60px;
+    margin-top: 6px;
+    position: relative;
+    float: left;
+    display: table;
+    clear: both;
+    word-break: break-word;
+}
+.chatbox .conversation .content_online .text-content p,
+.chatbox .conversation .content_online .text-content-user p {
+    font-family: 'segoe ui', 'arial', sans-serif;
+    font-size: 12px;
+    line-height: 19px;
+    font-weight: 400;
+    /*//letter-spacing: 0.05em;*/
+    color: #333;
+    display: block;
+}
+.chatbox .conversation .content_online .text-content p:first-child,
+.chatbox .conversation .content_online .text-content-user p:first-child {
+    color: #f05077;
+    opacity: 1;
+}
+.chatbox .conversation .content_online .text-content:after,
+.chatbox .conversation .content_online .text-content-user:after {
+    content: '';
+    width: 50px;
+    height: 50px;
+    background: url(../img/AVATAR%20SMALL.png);
+    position: absolute;
+    top: 0;
+    left: -60px;
+}
+.chatbox .conversation .content_online .text-content:before,
+.chatbox .conversation .content_online .text-content-user:before {
+    content: '';
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent rgba(255, 255, 255, 0.55) transparent transparent;
+    position: absolute;
+    top: 10px;
+    left: -14px;
+}
+.chatbox .conversation .content_online .text-content-user {
+    /*margin-left: 10px;*/
+    margin-right: 50px;
+    float: right;
+}
+.chatbox .conversation .content_online .text-content-user:after {
+    content: '';
+    width: 50px;
+    height: 50px;
+    background: url(../img/AVATAR%20SMALL.png);
+    position: absolute;
+    top: 0;
+    left: calc(100% + 10px);
+}
+.chatbox .conversation .content_online .text-content-user:before {
+    content: '';
+    border-width: 7px;
+    border-style: solid;
+    border-color: transparent transparent transparent rgba(255, 255, 255, 0.55);
+    position: absolute;
+    top: 10px;
+    left: calc(100% + 0px);
+}
+.chatbox .conversation .content_online .text-content-user p {
+    text-align: left;
+}
+.chatbox .typings .uploadFileForm{
+    width: 50%;
+    float: right;
+    text-align: right;
+}
+.chatbox .typings .uploadFileForm .chat_icon{
+    font-size:18px;
+    margin-right:10px;
+    color: gray
+}
+.chatbox .bottom {
+    background: #34495e;
+    width: 100%;
+}
+.chatbox .bottom textarea {
+    width: 100%;
+    height: 40px;
+    background: #f05077;
+    font-family: 'segoe ui', 'arial', sans-serif;
+    /*box-shadow: 0px -1px 3px rgba(0, 0, 0, 0.15);*/
+    font-size: 13px;
+    padding: 8px 20px;
+    /*transition: all 0.3s ease;*/
+    position: absolute;
+    border: none;
+    color: #fff;
+    resize: none;
+}
+.chatbox .bottom textarea:focus {
+    color: #fff;
+    outline: none;
+    border: none;
+    /*box-shadow: 0 3px 5px #202d3b;*/
+}
+.chatbox .choose-file
+{
+    width: 100%;
+    height: 20px;
+    position: absolute;
+    bottom: 0;
+}
+.chatbox_2 {
+    right: 400px;
+}
+.chatbox_3 {
+    right: 800px;
+}

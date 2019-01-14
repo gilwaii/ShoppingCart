@@ -1,0 +1,301 @@
+      <!--CONTENT-->
+      <div class="background">
+        <div class="container ng-scope" ng-controller="ShoppingCartController"> 
+          <div class="row">
+            <div class="fix-products">
+              <!--Menu-->
+                              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 heading_hong news-page-heading">
+                  <h2>{{category.name}}</h2>
+                  <hr>
+                </div>
+                            <div class="page-container" id="PageContainer">
+                 <main class="main-content" id="MainContent" role="main">
+                    <div class="container">
+                       <div class="row">
+                          <div class="home-left-sidebar col-md-3 col-lg-3 hidden-xs hidden-sm">
+	<div id="shopify-section-home-left-sidebar" class="shopify-section">
+		<div class="group_left all-collections hidden-xs hidden-sm">
+			<div class="shopby-collections">
+	<div class="shopby-title">
+		<i class="fa fa-list"></i><span>Danh mục sản phẩm</span>
+	</div>
+	<div class="navbar-default fix-menu" role="navigation">
+        <div class="sidebar-nav">
+			<ul class="shopy-content nav fiv-nav-color" id="side-body">
+                                                                {{# each categories}}
+                                                                <li>
+                                                                    <a class="title-text" href="/categories/{{this._id}}">
+                                                                        <h4>{{this.name}}</h4>
+                                                                    </a>
+                                                                </li>
+                                                                {{/each}}
+                                                            </ul>		</div>
+	</div>
+</div>		</div>
+						   <div class="group_left bestseller">
+      <div class="bestseller-content">
+         <div class="left-title section-header">
+			 			<h2>Sản phẩm mới nhất</h2>
+			         </div>
+         <ul class="left-content best-slider owl-carousel owl-theme" style="display: block; opacity: 1;">
+            <div class="owl-wrapper-outer"><div class="owl-wrapper" style="width: 506px; left: 0px; display: block; transition: all 1000ms ease 0s; transform: translate3d(0px, 0px, 0px);"><div class="owl-item" style="width: 253px;"><div class="product-item-wrapper">
+                                             </div></div></div></div>
+         <div class="owl-controls clickable" style="display: none;"><div class="owl-buttons"><div class="owl-prev"><i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i></div><div class="owl-next"><i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i></div></div></div></ul>
+      </div>
+   </div>
+
+					</div>
+</div>                          <section id="product">
+    <div class="col-lg-9 col-md-9 col-sm-12 col-xs-12">
+		        <div class="images-banner">
+            <figure>
+                <img class="imgage-news img-responsive" src="{{category.image}}" alt="{{category.name}}">
+            </figure>
+        </div>
+		                <div class="row products-box">
+                            {{# each products}}
+                            {{# each this}}
+                        <div class="col-xs-6 col-sm-6 col-md-4">
+            <div class="item">
+                <figure> 
+                                            <img class="img-responsive lazy square" data-original="{{this.image}}" alt="Moki.vn - Ứng dụng mua bán trên di động | {{category.name}}" src="{{this.image}}" style="display: block;">
+                                        <!-- <figcaption class="box-shadow">CHI TIẾT</figcaption> -->
+                    <a href="/products/{{this._id}}">
+                    </a>
+                    <!--                         <div class="tag">
+                            <div class="tag_container">
+                                <span></span>    
+                            </div>                    
+                        </div>
+                      -->
+                </figure>
+                <div class="text-content">
+                   <!-- <a href="" class="categories">                   </a> -->
+                    <h2 class="name">
+                        <a href="/products/{{this._id}}">
+                            <p class="truncated" style="overflow-wrap: break-word;">{{this.name}}</p>
+                        </a>
+                    </h2>
+                    <div class="rating-star">
+                        <span class="spr-badge" id="spr_badge_9868100876" data-rating="4.">
+                            <span class="spr-starrating spr-badge-starrating">
+                                <i class="spr-icon spr-icon-star" style=""></i>
+                                <i class="spr-icon spr-icon-star" style=""></i>
+                                <i class="spr-icon spr-icon-star" style=""></i>
+                                <i class="spr-icon spr-icon-star" style=""></i>
+                                <i class="spr-icon spr-icon-star-empty" style=""></i>
+                            </span>
+                            <span class="spr-badge-caption"></span>
+                        </span>
+                    </div>
+                    
+                    <div class="product-price">
+                        <span class="price_sale" style="">
+                            <span class="money">
+                                {{this.price}}                            </span>
+                        </span>
+                                            </div>
+                    <!-- <div class="like"></div> -->
+                    <!-- <div class="comment"></div> -->
+                    <!-- <hr> -->
+                    <!-- <p class="description truncated"></p> -->
+                    <!-- <div class="row" style="margin: 0px;">
+                        <div class="col-xs-6 col-sm-6 col-md-12 col-lg-6" style="padding: 0px;">
+                            <p class="status">Trạng thái: 
+                                <span></span>
+                            </p>
+                        </div>
+                        <div class="col-xs-6 col-sm-6 col-md-12 col-lg-6"  style="padding: 0px;">
+                            <p class="price">Giá: 
+                                <span></span>
+                            </p>
+                        </div>
+                    </div> -->
+                </div>
+         
+            </div>
+        </div>
+        {{/each}}
+        {{/each}}
+            </div>
+                    <div class="row">
+                <div class="col-xs-12">
+                    <div class="pager pagin">
+				<li></li>
+				<li>
+			</li><li class="current"><a>1</a></li><li><a href="https://moki.vn/Mien-Phi-302/trang-2.html" model="Product">2</a></li><li><a href="https://moki.vn/Mien-Phi-302/trang-3.html" model="Product">3</a></li>		
+				<li></li><li><a href="https://moki.vn/Mien-Phi-302/trang-6.html" model="Product" rel="last">»</a></li>
+	</div>
+                </div>
+            </div>
+    </div>
+</section>                       </div>
+                    </div>
+                 </main>
+              </div>
+            </div>
+          </div>
+          <!-- Modal -->    
+        <!--modal tablet-->
+        
+        <!--end modal tablet-->
+      </div>
+    </div>
+
+<!-- popup -->
+<!--end-->
+<script>
+    function myFunction() {
+        $("#email").val('');
+    }
+</script>
+  <script>
+    var PATHNAME=window.location.pathname;
+    
+    var TOJSDATA='W10=';
+    
+    var Router = 
+    {
+        controller: "Categories",
+        action: "index",
+        pass: "302",
+    };
+    Router.controller = Router.controller.toLowerCase();
+    Router.action = Router.action.toLowerCase();
+        </script>    
+
+  
+      <script>
+        var loadDeferredStyles = function() {
+          var addStylesNode = document.getElementById("deferred-styles");
+          var replacement = document.createElement("div");
+          replacement.innerHTML = addStylesNode.textContent;
+          document.body.appendChild(replacement)
+          addStylesNode.parentElement.removeChild(addStylesNode);
+        };
+        var raf = requestAnimationFrame || mozRequestAnimationFrame ||
+        webkitRequestAnimationFrame || msRequestAnimationFrame;
+        if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
+        else window.addEventListener('load', loadDeferredStyles);
+      </script>
+
+  
+	<script type="text/javascript" src="/products/source/jquery-2.1.0.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/sb-admin-2.js.download"></script>
+	<script type="text/javascript" src="/products/source/metisMenu.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/jQuery.scrollSpeed.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.dotdotdot.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.lazyload.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.parallax-1.1.3.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.parallax-scroll.js.download"></script>
+	<script type="text/javascript" src="/products/source/bootstrap.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/slick.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.countTo.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.rateit.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/toastr.js.download"></script>
+	<script type="text/javascript" src="/products/source/bootbox.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/swiper.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/angular.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/socket.io.js.download"></script>
+	<script type="text/javascript" src="/products/source/chatbox.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.mousewheel-3.0.6.pack.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.fancybox.pack.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.fancybox-buttons.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.fancybox-media.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.fancybox-thumbs.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_object.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_date.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_base64.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_cookie.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_math.js.download"></script>
+	<script type="text/javascript" src="/products/source/mq_url_params.js.download"></script>
+	<script type="text/javascript" src="/products/source/base.js.download"></script>
+	<script type="text/javascript" src="/products/source/myscript.js.download"></script>
+	<script type="text/javascript" src="/products/source/shoppingcart.js.download"></script>
+	<script type="text/javascript" src="/products/source/lightgallery.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-fullscreen.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-thumbnail.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-video.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-autoplay.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-zoom.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-hash.js.download"></script>
+	<script type="text/javascript" src="/products/source/lg-pager.js.download"></script>
+	<script type="text/javascript" src="/products/source/video.js.download"></script>
+	<script type="text/javascript" src="/products/source/magiczoomplus.js.download"></script>
+	<script type="text/javascript" src="/products/source/prettify.min.js.download"></script>
+	<script type="text/javascript" src="/products/source/scripts75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/option_selection.js.download"></script>
+	<script type="text/javascript" src="/products/source/imagesloaded.pkgd.min75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/owl.carousel.min75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.zoom75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.fancybox75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.vimeo.api75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/modernizr75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.smooth-scroll.min75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/classie75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/cs-hellobaby.script75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/currencies.js.download"></script>
+	<script type="text/javascript" src="/products/source/jquery.currencies.min75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/linkOptionSelectors75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/scripts.js.download"></script>
+	<script type="text/javascript" src="/products/source/vendor75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/theme75db.js.download"></script>
+	<script type="text/javascript" src="/products/source/shopify_stats1bce.js.download"></script>
+    
+    
+    
+    <script>
+      window.onload=function ()
+      {
+        $("#orderBt").click(function ()
+        {
+          window.location="/ShoppingCarts";
+        });
+        $("#orderBtMobile").click(function ()
+        {
+          window.location="/ShoppingCarts";
+        });
+
+      }
+      $(document).ready(function() {
+        $(".fancybox-thumb").fancybox({
+          prevEffect  : 'none',
+          nextEffect  : 'none',
+          helpers : {
+            title : {
+              type: 'outside'
+            },
+            thumbs  : {
+              width : 50,
+              height  : 50
+            }
+          }
+        });
+      });  
+    </script>    <div class="magic-hidden-wrapper"></div><div>
+  
+	<link rel="stylesheet" type="text/css" href="/products/source/bootstrap.min.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/normalize.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/animate.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/slick.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/slick-theme.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/font-awesome.min.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/style.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/chatbox.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/style_product.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/rateit.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/style_cart.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/jquery.fancybox.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/jquery.fancybox-buttons.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/jquery.fancybox-thumbs.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/swiper.min.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/lightgallery.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/video-js.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/magiczoomplus.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/prettify.min.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/owl.carousel75db.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/cs-hellobaby.global.scss75db.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/cs-hellobaby.styles.scss75db.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/styles75db.css" async="1">
+	<link rel="stylesheet" type="text/css" href="/products/source/spr.css" async="1">
+	 </div></body></html>

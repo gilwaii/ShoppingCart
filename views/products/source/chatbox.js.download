@@ -1,0 +1,727 @@
+function isSupportLocalstorage()
+{
+    try
+    {
+        localStorage.setItem("test","test");
+        return true;
+    }
+    catch (e)
+    {
+        return false;
+    }
+}
+
+function setCookieShop(key,value,exminutes) 
+{
+    var strValue=JSON.stringify(value);
+    var d = new Date();
+    d.setTime(d.getTime() + exminutes*60*1000);
+    var expires = "expires="+d.toUTCString();
+    var strValue=Base64.encode(strValue);
+    document.cookie = key + "=" + strValue + "; " + expires+"; path=/";
+}
+
+function getCookieShop(key) 
+{
+    var name = key + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) 
+    {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') 
+        {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) 
+        {
+            var strValue= c.substring(name.length, c.length);
+            strValue=Base64.decode(strValue);
+            try
+            {
+                return JSON.parse(strValue);
+            }
+            catch (ex)
+            {
+                return strValue;
+            }
+        }
+    }
+    return null;
+}
+
+function removeCookieShop(key)
+{
+    setCookieShop(key,"",0);
+}
+
+function convertMessage(message)
+{
+    message = message.replace(/\n/g,"<br>");
+    return message;
+}
+
+function linkify(inputText) 
+{
+    var replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+    //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+    replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+    //Change email addresses to mailto:: links.
+    replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
+}
+
+
+
+if(mokiApp===undefined)
+    var mokiApp = angular.module("mokiApp", []);
+
+mokiApp.directive("ngMqChange", function() 
+{
+    var object={
+        restrict: "A",
+        link: function (scope, element, attrs) 
+        {
+            element.bind("change",scope.choiceUploadFile);
+        }
+    };
+    return object;
+});
+
+mokiApp.factory("memory",["$rootScope",function($rootScope) 
+{
+    var object={};
+    object.getShow=function ()
+    {
+        if(this.getData("show")==null)
+            return 0;
+        else
+            return this.getData("show");
+    }
+    
+    object.setShow=function(show)
+    {
+        if(show==undefined)
+        {
+            if(this.getShow()!=0)
+                this.saveData("show",0,60);
+        }
+        else
+        {
+            if(this.getShow()!=show)
+                this.saveData("show",show,60);
+        }
+    }
+    
+    $(window).bind("storage", function (event)
+    {
+        if(event.originalEvent.key=="show")
+        {
+            $rootScope.onChangeShow(object.getShow());
+        }
+    }.bind(this));
+
+    object.saveData=function (key,value,minutes)
+    {
+        if(isSupportLocalstorage())
+            localStorage.setItem(key,value);
+        else
+            setCookieShop(key,value,minutes);
+    }
+    
+    object.getData=function (key)
+    {
+        if(isSupportLocalstorage())
+            return localStorage.getItem(key);
+        else
+            return getCookieShop(key);
+    }
+
+    object.removeData=function (key)
+    {
+        if(isSupportLocalstorage())
+            return localStorage.getItem(key);
+        else
+            return getCookieShop(key);
+    }
+    
+    return object;
+}]); 
+
+mokiApp.factory("chatAjax",["$http","$rootScope",function ($http,$rootScope) 
+{
+    var object={};
+    object.uploadFile=function(formData)
+    {
+        $.ajax({
+            url: "/Api/upload_chat_file",
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+        })
+        .done(function (data)
+        {
+            $rootScope.uploadFileResponse(true,data);
+        })
+        .fail(function ()
+        {
+            $rootScope.uploadFileResponse(false);
+        })
+        .always(function ()
+        {
+
+        });
+    };
+    return object;
+}]);   
+    
+mokiApp.config(function($locationProvider){
+     $locationProvider.html5Mode({
+        enabled: true,
+        requireBase: false,
+        rewriteLinks: false
+    });
+});
+
+mokiApp.filter("trust", ['$sce', function($sce) 
+{
+    return function(htmlCode)
+    {
+        return $sce.trustAsHtml(htmlCode);
+    }
+}]);
+
+mokiApp.filter("getFileName",function() 
+{
+    return function(url)
+    {
+        console.log(url);
+        var arr=url.split("/");
+        var len=arr.length;
+        console.log(arr[len-1]);
+        return arr[len-1];
+    }
+});
+
+mokiApp.factory('socket', function ($rootScope) {
+    return {
+        connect: function (uid)
+        {
+            console.log($(".chatbox").data("server"));
+            var socket = io.connect($(".chatbox").data("server"));
+            return {
+                on: function (eventName, callback)
+                {
+                    socket.on(eventName, function ()
+                    {
+                        var args = arguments;
+                        $rootScope.$apply(function ()
+                        {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+                emit: function (eventName, data, callback)
+                {
+                    socket.emit(eventName, data, function ()
+                    {
+                        var args = arguments;
+                        $rootScope.$apply(function ()
+                        {
+                            if (callback)
+                            {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    })
+                },
+                disconnect: function () {
+                    socket.disconnect();
+                }
+            }
+        },
+        init: function ($scope, uid)
+        {
+            var socket = this.connect(uid);
+            socket.on('connect', function ()
+            {
+                //relogin
+                console.log("connected to socket server",$scope.logged);
+                if($scope.logged == true){
+                    $scope.checkLogged();
+                }
+                
+            });
+            socket.on("login_response", function (data)
+            {
+                $scope.loginResponse(data);
+            });
+            socket.on("check_admin_online_response", function (data)
+            {
+                $scope.checkAdminOnlineResponse(data);
+            });
+            socket.on("rate_admin_response",function (data)
+            {
+                $scope.rateAdminResponse(data);
+            });
+                socket.on("rate_admin_update_notify",function (data)
+            {
+                $scope.rateAdminUpdateNotify(data);
+            });
+            socket.on("register_all_message_response", function (data)
+            {
+                $scope.registerAllMessageResponse(data);
+            });
+            socket.on("send_message_response", function (data)
+            {
+                $scope.sendMessageResponse(data);
+            });
+            socket.on("all_message_notify", function (data)
+            {
+                $scope.allMessageNotify(data);
+            });
+            socket.on('new_message_notify', function (data)
+            {
+                $scope.newMessageNotify(data);
+            });
+            socket.on('admin_join_room_notify', function (data)
+            {
+                $scope.adminJoinRoomNotify(data);
+            });
+            socket.on('admin_leave_room_notify', function (data)
+            {
+                $scope.adminLeaveRoomNotify(data);
+            });
+            socket.on('typing_notify',function (data)
+            {
+               $scope.typingNotify(data); 
+            });
+            socket.on('error',function (data)
+            {
+               console.log("fdfds");
+            });
+            return socket;
+        }
+    };
+});
+
+mokiApp.factory('cookie', function ($rootScope) {
+    return {
+        init: function ($scope)
+        {
+            var cookie = {
+                setCookie: function (key, value, exmins)
+                {
+                    var d = new Date();
+                    d.setTime(d.getTime() + (exmins*60 * 1000));
+                    var expires = "expires=" + d.toUTCString();
+                    document.cookie = key + "=" + value + "; " + expires;
+                },
+                getCookie: function (key)
+                {
+                    var name = key + "=";
+                    var ca = document.cookie.split(';');
+                    for (var i = 0; i < ca.length; i++)
+                    {
+                        var c = ca[i];
+                        while (c.charAt(0) == ' ')
+                        {
+                            c = c.substring(1);
+                        }
+                        if (c.indexOf(name) == 0)
+                        {
+                            return c.substring(name.length, c.length);
+                        }
+                    }
+                    return null;
+                },
+            };
+            return cookie;
+        }
+    };
+});
+
+
+mokiApp.controller('ChatController', ["$scope", "$rootScope","$window","$location","$anchorScroll","$sce","socket", "cookie","chatAjax","memory", function ($scope, $rootScope,$window,$location,$anchorScroll,$sce,socket,cookie,chatAjax,memory)
+{
+    var socket; 
+    var cookie=cookie.init($scope);
+    $scope.view = "signup";
+    $scope.conversation = {};
+    var newMessageAudio = new Audio("/moki/audio/new_message.mp3");
+    var newRoomAudio = new Audio("/moki/audio/new_room.mp3");
+    $scope.logged = false;
+    $scope.loginResponse = function (data)
+    {
+        if(data.success)
+        {
+            $scope.logged = true;
+            $scope.view = "chat";
+            var roomInfo = data.roomInfo;
+            $scope.conversation.roomInfo = roomInfo;
+            cookie.setCookie("moki_chat_id", $scope.conversation.roomInfo.customerInfo.id,$(".chatbox").data("data-cookie"));
+            socket.emit("check_admin_online_request", {});
+            socket.emit("register_all_message_request", {});
+        }
+    }
+
+    $scope.checkAdminOnlineResponse = function (data)
+    {
+        console.log("Check Admin Online Response");
+        console.log(data);
+        if (!data.result)
+            $scope.view = "email";
+    }
+
+    $scope.rateAdminResponse=function (data)
+    {
+        console.log("Rate Admin Response");
+        console.log(data);
+    }
+    
+    $scope.rateAdminUpdateNotify=function (data)
+    {
+        console.log("Rate Admin Update Notify");
+        console.log(data);
+        var roomInfo=data.roomInfo;
+        $scope.conversation.roomInfo=roomInfo;
+    }
+    
+    $scope.registerAllMessageResponse = function (data)
+    {
+        console.log("register All Message Response");
+    }
+    
+    $scope.sendMessageResponse=function(data)
+    {
+        console.log("Send Message Response");
+        if(!data.success)
+        {
+            alert("Gửi tin nhắn không thành công:"+data.message+".Vui lòng thử lại !");
+        }
+    }
+
+    $scope.allMessageNotify = function (data)
+    {
+        console.log("All Mesage Notify");
+        //console.log(data);
+        var messages = data;
+        for(var key in messages)
+        {
+            var message=messages[key];
+            if(message.message_type==0)
+            {
+                message.content=convertMessage(message.content);
+                message.content=linkify(message.content);
+            }
+        }
+        var len=messages.length;
+        $scope.conversation.messages = messages;
+        var lastMessage=messages[len-1];
+        setTimeout(function ()
+        {
+            $location.hash('messageDiv' + lastMessage.id);
+            $anchorScroll();
+            //$location.hash("");
+        },100);
+    }
+
+    $scope.newMessageNotify = function (data)
+    {
+        console.log("New Message Notify");
+        if (data.type == 2)
+            newMessageAudio.play();
+        var message = data;
+        if(message.message_type==0)
+        {
+            message.content=convertMessage(message.content);
+            message.content=linkify(message.content);
+        }
+        if($scope.conversation.messages!=undefined&&$scope.conversation.messages.push!=undefined)
+        {
+            $scope.conversation.messages.push(message);
+            setTimeout(function ()
+            {
+                $location.hash('messageDiv' + message.id);
+                $anchorScroll();
+                $location.hash("");     
+            },50);
+        }
+    }
+
+    $scope.adminJoinRoomNotify = function (data)
+    {
+        console.log("Admin Join Room Notify");
+        newRoomAudio.play();
+        var roomInfo = data.roomInfo;
+        $scope.conversation.roomInfo = roomInfo;
+    }
+
+    $scope.adminLeaveRoomNotify = function (data)
+    {
+        var roomInfo = data.roomInfo;
+        $scope.conversation.roomInfo = roomInfo;
+    }
+
+    $scope.typingNotify=function(data)
+    {
+        console.log("Typing Notify");
+        console.log(data);
+        var roomInfo=data.roomInfo;
+        $scope.conversation.roomInfo = roomInfo;
+    }
+
+    $scope.closeChat = function (roomId)
+    {
+        
+    }
+    
+    $scope.keyPressEvent = function ($event)
+    {
+        if($scope.typingAction!==undefined&&$scope.typingAction!==null)
+            clearTimeout($scope.typingAction);
+        
+        if($scope.conversation.roomInfo.customerInfo.typingStatus!="typing")
+            socket.emit("typing_request",{state:"typing"});
+        
+        $scope.typingAction=setTimeout(function ()
+        {
+            if($scope.conversation.roomInfo.customerInfo.typingStatus!="stop")
+            {
+                socket.emit("typing_request",{state:"stop"})
+            }
+        },2000);
+        
+        if ($event.keyCode == 13 || $event.keyCode == 10)
+        {                       
+            var message=$scope.inputMessage;
+            if(message!==""&&message!=="\n")
+                socket.emit("send_message_request", {message: message});
+            $scope.inputMessage = "";
+            $("#textarea_online").val(""); 
+        }
+    }
+
+    $scope.clickSendEvent = function (roomId)
+    {
+        socket.emit("send_message_request", {message: $scope.inputMessage});
+        $scope.inputMessage = "";
+    }
+
+    $scope.loginEvent = function ()
+    {
+        if($scope.loginForm.$invalid)
+        {
+            if($scope.loginForm.$error.required !== undefined)
+            {
+                alert("Tên, điện thoại, email không được để trống.");
+                return ;
+            }
+            
+
+            if($scope.loginForm.$error.minlength !== undefined || $scope.loginForm.$error.maxlength !== undefined)
+            {
+                alert("Tên từ 4 đến 12 ký tự,điện thoại từ 10 đến 11 số.");
+                return ;
+            }
+            if($scope.loginForm.$error.email !== undefined || $scope.loginForm.$error.pattern !== undefined)
+            {
+                alert("Email không hợp lệ, số điện thoại là số");
+                return ;
+            }                   
+        }
+        else
+        {
+            var data =
+            {
+                name: $scope.name,
+                email: $scope.email,
+                phone: $scope.phone
+            };
+            console.log("Send login request");
+            socket.emit("login_request", data);
+        }
+    }
+
+    $scope.sendMailEvent = function ()
+    {
+        if($scope.sendMailForm.$invalid)
+        {
+            console.log($scope.sendMailForm.$error);
+            if($scope.sendMailForm.$error.required !== undefined)
+            {
+                alert("Tiêu đề và nội dung không được để trống.");
+                return ;
+            }
+            
+            if($scope.sendMailForm.$error.minlength !== undefined||$scope.sendMailForm.$error.maxlength !== undefined)
+            {
+                alert("Tiêu đề hơn 4 đến 200 ký tự,nội dung hơn 10 ký tự.");
+                return ;
+            }                  
+        }
+        else
+        {
+            socket.emit("send_mail_request", {title: $scope.emailTitle
+                                            ,content: $scope.emailContent});
+            $scope.emailTitle = "";
+            $scope.emailContent = "";
+        }
+    }
+    
+    $scope.rateEvent= function (type)
+    {
+        socket.emit("rate_admin_request",{type:type,comment:""});
+    }
+
+    $scope.openChat = function ()
+    {
+        if($scope.isOnChat())
+            $scope.offChat();
+        else
+            $scope.onChat();
+    }
+
+    $rootScope.onChangeShow=function(newShow)
+    {
+        if(newShow==0)
+            $scope.offChat();
+        else
+            $scope.onChat();
+    }
+    
+    $scope.inited=false;
+    $scope.onChat=function ()
+    {
+        if(!$scope.isOnChat())
+        {
+            memory.setShow(1);
+            $(".chatbox").addClass("hienra");
+            $(".nhanvien").addClass("hidetobuttom");
+        }
+        
+        if(!$scope.inited)
+        {
+            socket=socket.init($scope);
+            $scope.inited=true;
+            
+            var timeout=setInterval(function()
+            {
+                if(typeof  socket.emit == "function" )
+                {
+                    clearInterval(timeout);
+                    if ($scope.view=="signup")
+                        $scope.checkLogged();
+                }
+            },100);
+        }
+        else
+        {
+            if ($scope.view=="signup")
+                $scope.checkLogged();
+        }
+    }
+    
+    $scope.offChat=function ()
+    {
+        if($scope.isOnChat())
+        {
+            memory.setShow(0);
+            $(".chatbox").removeClass("hienra");
+            $(".nhanvien").removeClass("hidetobuttom");
+        }
+    }
+    
+    $scope.isOnChat=function ()
+    {
+        return $(".chatbox").hasClass("hienra");
+    }
+
+    $scope.exit=function ()
+    {
+        if($scope.view=="chat"||$scope.view=="email")
+        {
+            cookie.setCookie("moki_chat_id", $scope.conversation.roomInfo.customerInfo.id,$(".chatbox").data("data-cookie"));
+            if($scope.view=="chat")
+                cookie.setCookie("logged",true,1);
+        }
+        
+        //memory.setShow(0);
+    }   
+
+    $scope.wantUploadFile=function ()
+    {
+        $("#fileI").click();
+    }
+    
+    $scope.choiceUploadFile=function ()
+    {
+        var formData=new FormData($("#uploadFileForm")[0]);
+        chatAjax.uploadFile(formData);
+    }
+
+    $rootScope.uploadFileResponse=function(success,response)
+    {
+        if(success)
+        {
+            if(response.code==0)
+            {
+                var url=response.data.url;
+                socket.emit("send_message_request", {message: url,message_type:1});
+            }
+            else
+            {
+                alert(response.message);
+            }
+        }
+        else
+        {
+            alert("Kết nối có lỗi vui lòng thử lại !");
+        }
+    }
+
+    $scope.unsupport=function ()
+    {
+        alert("Chức năng này đang phát triển!");
+    }
+
+    $scope.checkLogged=function ()
+    {
+        if (cookie.getCookie("moki_chat_id") != null)
+        {
+            $scope.view = "chat";
+            var id = cookie.getCookie("moki_chat_id");
+            var data =
+                {
+                    id: id
+                };
+            console.log("Send login request");
+            socket.emit("login_request", data);
+        } else
+            $scope.view = "signup";
+    }
+    
+    $window.onbeforeunload =  $scope.exit;
+    
+    setTimeout(function ()
+    {
+        if(memory.getShow()==1)
+        {
+            $scope.onChat();
+        }
+    },100);
+    
+}]);
+
+var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t;}};

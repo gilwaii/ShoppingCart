@@ -1,0 +1,13 @@
+if(!(typeof MQObject === "function"))
+{
+    /*class MQObject extends Object
+    {
+        constructor() 
+        {
+            super();
+        }
+    }*/
+	var MQObject = Object;
+    
+    window.MQObject=MQObject;
+}

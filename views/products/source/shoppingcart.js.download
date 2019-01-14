@@ -1,0 +1,1966 @@
+function shopAlert(message,callback,buttonLabel)
+{
+    if(buttonLabel==undefined||buttonLabel==null)
+        buttonLabel="Tiếp tục";
+    bootbox.addLocale("vi",{
+        OK: buttonLabel,
+        CANCEL: "Hủy",
+        CONFIRM: "Đồng ý"
+    });
+    bootbox.setLocale("vi");
+    bootbox.alert({ 
+        size: "small",
+        title: "<b>Thông báo</b>",
+        message: message,
+        callback: callback
+    });
+
+}
+
+function shopConfirm(message,callback)
+{
+    bootbox.addLocale("vi",{
+        OK: "Có",
+        CANCEL: "Không",
+        CONFIRM: "Đồng ý"
+    });
+    bootbox.setLocale("vi");
+    bootbox.confirm({ 
+        size: "small",
+        title: "<b>Thông báo</b>",
+        message: message,
+        callback: callback
+    });
+}
+
+function getIsMobile()
+{
+    return isMobile;
+}
+
+function isSupportLocalstorage()
+{
+    try
+    {
+        localStorage.setItem("test","test");
+        return true;
+    }
+    catch (e)
+    {
+        return false;
+    }
+}
+
+function byteSize(str) 
+{
+    var bytes=0, len=str.length, codePoint, next, i;
+
+    for (i=0; i < len; i++) 
+    {
+        codePoint = str.charCodeAt(i);
+
+        // Lone surrogates cannot be passed to encodeURI
+        if (codePoint >= 0xD800 && codePoint < 0xE000) 
+        {
+            if (codePoint < 0xDC00 && i + 1 < len) 
+            {
+                next = str.charCodeAt(i + 1);
+
+                if (next >= 0xDC00 && next < 0xE000) 
+                {
+                    bytes += 4;
+                    i++;
+                    continue;
+                }
+            }
+        }
+        bytes += (codePoint < 0x80 ? 1 : (codePoint < 0x800 ? 2 : 3));
+    }
+    return bytes;
+}
+function setCookieShop(key,value,exminutes) 
+{
+    var strValue=JSON.stringify(value);
+    var d = new Date();
+    d.setTime(d.getTime() + exminutes*60*1000);
+    var expires = "expires="+d.toUTCString();
+    var strValue=Base64.encode(strValue);
+    document.cookie = key + "=" + strValue + "; " + expires+"; path=/";
+}
+
+function getCookieShop(key) 
+{
+    var name = key + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) 
+    {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') 
+        {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) 
+        {
+            var strValue= c.substring(name.length, c.length);
+            strValue=Base64.decode(strValue);
+            try
+            {
+                return JSON.parse(strValue);
+            }
+            catch (ex)
+            {
+                return strValue;
+            }
+        }
+    }
+    return null;
+}
+
+function removeCookieShop(key)
+{
+    setCookieShop(key,"",0);
+}
+
+function replaceDiscountValueView(discountValueView)
+{
+    return discountValueView.replace(",000đ", ",000đ").replace("Save", "KM:");
+}
+
+function ceilPrice(price)
+{
+    var x=price/1000;
+    var x=Math.ceil(x);
+    return x*1000;
+}
+
+function convertPrice(strPrice)
+{
+    var newPrice = "";
+    var len = strPrice.length;
+    for (var i = 0; i < len; i++)
+    {
+        var char = strPrice.charAt(i);
+        if (char !== ',')
+            newPrice = newPrice + char;
+    }
+    return parseInt(newPrice);
+}
+
+function convertPriceToStr(price)
+{
+    var strPrice = price.toString();
+    var newStr = "";
+    var j = 0;
+    for (var i = strPrice.length - 1; i >= 0; i--)
+    {
+        newStr = strPrice.charAt(i) + newStr;
+        j++;
+        if (j == 3)
+        {
+            j = 0;
+            if (i != 0)
+                newStr = "," + newStr;
+        }
+    }
+    return newStr;
+}
+
+function discountValueIsPercent(strDiscountValue)
+{
+    var len = strDiscountValue.length;
+    var lastChar = strDiscountValue.charAt(len - 1);
+    if (lastChar == '%')
+        return true;
+    else
+        return false;
+
+}
+
+function ShoppingCart($scope)
+{
+    this.shoppingCart = null;
+
+    this.getContent = function ()
+    {
+        return this.shoppingCart;
+    }
+
+    this.addProduct = function (product)
+    {
+        var productId = product.Product.id;
+        if (this.shoppingCart.productTypes[productId] === undefined)
+        {
+            var productType = {
+                info: product,
+                time: new Date().getTime(),
+                totalPrice: 0,
+                totalPriceDiscount: 0,
+                totalDiscountValue: 0,
+                totalPromotionValue: null,
+                totalDiscountPromotionValue: 0,
+                totalVATPrice: 0,
+                totalShipFee: null,
+                totalPayPrice: null,
+                count: 1,
+                disable: false,
+            };
+            this.shoppingCart.productTypes[productId] = productType;
+            if (this.shoppingCart.payType != null && this.shoppingCart.address != null)
+                this.calculatorProductTypeShipFee(productType);
+            else
+                this.changeProductType(productType);
+        } 
+        else
+        {
+            var productType = this.shoppingCart.productTypes[productId];
+            productType.count++;
+            this.changeProductType(productType);
+        }
+    }
+
+    this.subProduct = function (productType)
+    {
+        var productId = productType.info.Product.id;
+        if (this.shoppingCart.productTypes[productId] !== undefined)
+        {
+            var productType = this.shoppingCart.productTypes[productId];
+            if (productType.count > 1)
+            {
+                productType.count--;
+                this.changeProductType(productType);
+            }
+        }
+    }
+
+    this.setProductTypeCount = function (product, count)
+    {
+        if (count < 1 || count > 5)
+            return;
+        var productId = product.Product.id;
+        if (this.shoppingCart.productTypes[productId] !== undefined)
+        {
+            var productType = this.shoppingCart.productTypes[productId];
+            productType.count = count;
+            this.changeProductType(productType);
+        }
+    }
+
+    this.removeProductType = function (productType)
+    {
+        var productId = productType.info.Product.id;
+        if (this.shoppingCart.productTypes[productId] !== undefined)
+        {
+            delete(this.shoppingCart.productTypes[productId]);
+            this.change();
+        }
+    }
+
+    this.isDisableProductType=function (productType)
+    {
+        if(productType.disable==undefined || productType.disable==null)
+            return false;
+        else
+            return productType.disable;
+
+    }
+
+    this.disableProductType = function (productType, change)
+    {
+        var productId = productType.info.Product.id;
+        if (this.shoppingCart.productTypes[productId] !== undefined)
+        {
+            var productType = this.shoppingCart.productTypes[productId];
+            productType.disable = true;
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+    
+    this.enableProductType=function(productType,change)
+    {
+        var productId = productType.info.Product.id;
+        if (this.shoppingCart.productTypes[productId] !== undefined)
+        {
+            var productType = this.shoppingCart.productTypes[productId];
+            productType.disable = null;
+            this.changeProductType(productType,false);
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.clearDisableProductType=function(change)
+    {
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if(this.isDisableProductType(productType))
+                this.enableProductType(productType,false);
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.setOfferPrice = function (productType, offerPrice,change)
+    {
+        if(productType.info.Product.tmp_price_discount==undefined ||
+            productType.info.Product.tmp_price_discount==null)
+            productType.info.Product.tmp_price_discount = productType.info.Product.price_discount;
+        productType.info.Product.price_discount = offerPrice;
+        if(productType.info.Product.tmp_discount_value==undefined ||
+            productType.info.Product.tmp_discount_value==null)
+            productType.info.Product.tmp_discount_value = productType.info.Product.discount_value;
+        productType.info.Product.discount_value = "Thương lượng";
+        productType.info.Product.note = "OffersPrice";
+        this.changeProductType(productType, change);  
+    }
+
+    this.setPromotionValue = function (promotionCode, promotionValue, productType,change)
+    {
+        productType.info.Product.promotion_code = promotionCode;
+        productType.info.Product.promotion_value = promotionValue;
+        if(change==undefined||change==true)
+            this.changeProductType(productType);
+    }
+    
+    this.getTotalProducts =function ()
+    {
+        var products = {};
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            var productId = productType.info.Product.id;
+            var count = productType.count;
+            var promotionCode = productType.info.Product.promotion_code;
+            if(promotionCode==undefined)
+                promotionCode=null;
+            var tmpPromotionCode=productType.info.Product.tmp_promotion_code;
+            if(tmpPromotionCode==undefined)
+                tmpPromotionCode=null;
+            var product = {product_id: productId, count: count,
+            promotion_code: promotionCode,tmp_promotion_code:tmpPromotionCode};
+            products[productId] = product;
+        }
+        return products;
+    }
+
+    this.getProducts = function ()
+    {
+        var products = {};
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+            {
+                var productId = productType.info.Product.id;
+                var count = productType.count;
+                var promotionCode = productType.info.Product.promotion_code;
+                if(promotionCode==undefined)
+                    promotionCode=null;
+                var product = {product_id: productId, count: count, promotion_code: promotionCode};
+                products[productId] = product;
+            }
+        }
+        return products;
+    }
+    
+    this.getCanBuyProducts=function ()
+    {
+        var products = {};
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+            {
+                var shipFee=productType.info.Product.ship_fee;
+                if(shipFee!=undefined&&shipFee!=null&&shipFee!=""&&shipFee!="fail")
+                {
+                    var productId = productType.info.Product.id;
+                    var count = productType.count;
+                    var promotionCode = productType.info.Product.promotion_code;
+                    if(promotionCode==undefined)
+                        promotionCode=null;
+                    var product = {product_id: productId, count: count, promotion_code: promotionCode};
+                    products[productId] = product;
+                }
+            }
+        }
+        return products;
+    }
+    
+    this.getCanBuyProductCount=function ()
+    {
+        return Object.keys(this.getCanBuyProducts()).length;
+    }
+    
+    this.getNeedRateProducts =function ()
+    {
+        var products = {};
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (productType.disable)
+            {
+                if(productType.cause=="Bạn chưa đánh giá sản phẩm mua trước.")
+                {
+                    var productId = productType.info.Product.id;
+                    var count = productType.count;
+                    var promotionCode = productType.info.Product.promotion_code;
+                    if(promotionCode==undefined)
+                        promotionCode=null;
+                    var product = {product_id: productId, count: count, promotion_code: promotionCode};
+                    products[productId] = product;
+                }
+            }
+        }
+        return products;
+    }
+
+    this.getNeedRateProductCount =function ()
+    {
+        return Object.keys(this.getNeedRateProducts()).length;
+    }
+
+    this.changeProductType = function (productType, change)
+    {
+        if (productType.disable)
+            return;
+        productType.totalPrice = productType.count
+        * parseInt(productType.info.Product.price);
+        productType.totalPriceDiscount = productType.count
+        * parseInt(productType.info.Product.price_discount);
+        productType.totalDiscountValue = productType.count
+        * (productType.info.Product.price - productType.info.Product.price_discount);
+
+        if (productType.info.Product.discount_value != null)
+            productType.totalDiscountView = productType.info.Product.discount_value;
+
+        if (productType.info.Product.promotion_value != null)
+            productType.totalPromotionValue = productType.info.Product.promotion_value * productType.count;
+        else
+            productType.totalPromotionValue = null;
+
+        if (productType.totalPromotionValue != null)
+            productType.totalDiscountPromotionValue = productType.totalDiscountValue + productType.totalPromotionValue;
+        else
+            productType.totalDiscountPromotionValue = productType.totalDiscountValue;
+
+        productType.totalVATPrice = productType.totalPrice - productType.totalDiscountPromotionValue;
+
+        if (productType.info.Product.ship_fee != null)
+            productType.totalShipFee = productType.count * productType.info.Product.ship_fee;
+        else
+            productType.totalShipFee = null;
+
+        if (productType.totalShipFee != null)
+            productType.totalPayPrice = productType.totalPrice - productType
+        .totalDiscountPromotionValue + productType.totalShipFee;
+        else
+            productType.totalPayPrice = null;
+
+        if (change === undefined || change === true)
+            this.change();
+    }
+
+    this.change = function ()
+    {
+        this.shoppingCart.productCount = this.getProductCount();
+        this.shoppingCart.productTypeCount = this.getProductTypeCount();
+
+        this.shoppingCart.totalPrice = this.getTotalPrice();
+        this.shoppingCart.totalPriceDiscount = this.getTotalPriceDiscount();
+        this.shoppingCart.totalDiscountValue = this.getTotalDiscountValue();
+        this.shoppingCart.totalPromotionValue = this.getTotalPromotionValue();
+        this.shoppingCart.totalDiscountPromotionValue = this.getDiscountPromotionValue();
+        this.shoppingCart.totalVATPrice = this.getTotalVATPrice();
+        this.shoppingCart.totalShipFee = this.getTotalShipFee();
+        this.shoppingCart.totalPayPrice = this.getTotalPayPrice();
+        if ($scope !== undefined)
+            $scope.reloadShoppingCart();
+        this.writeContent();
+    }
+
+    this.getProductTypeCount = function ()
+    {
+        var count = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            count++;
+        }
+        return count;
+    }
+
+    this.getProductCountById = function (product)
+    {
+        var productId = product.Product.id;
+        if (this.shoppingCart.productTypes[productId] === undefined)
+            return 0;
+        else
+            return this.shoppingCart.productTypes[productId].count;
+    }
+
+    this.getProductCount = function ()
+    {
+        var count = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                count = count + productType.count;
+        }
+        return count;
+    }
+
+    this.getDisableProductCount = function ()
+    {
+        var count = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (productType.disable)
+                count = count + productType.count;
+        }
+        return count;
+    }
+
+    this.getTotalProductCount=function ()
+    {
+        var count=0;
+        for(var key in this.shoppingCart.productTypes)
+        {
+            var productType=this.shoppingCart.productTypes[key];
+            count=count+productType.count;
+        }
+        return count;
+    }
+
+    this.getTotalPrice = function ()
+    {
+        var totalPrice = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                totalPrice = totalPrice + productType.totalPrice;
+        }
+        return totalPrice;
+    }
+
+    this.getTotalPriceDiscount = function ()
+    {
+        var totalPriceDiscount = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                totalPriceDiscount = totalPriceDiscount + productType.totalPriceDiscount;
+        }
+        return totalPriceDiscount;
+    }
+
+    this.getTotalDiscountValue = function ()
+    {
+        var totalDiscountValue = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                totalDiscountValue = totalDiscountValue + productType.totalDiscountValue;
+        }
+        return totalDiscountValue;
+    }
+
+    this.getTotalPromotionValue = function ()
+    {
+        var totalPromoitonValue = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                if (productType.totalPromotionValue != null)
+                    totalPromoitonValue = totalPromoitonValue + productType.totalPromotionValue;
+        }
+        return totalPromoitonValue;
+    }
+
+    this.getDiscountPromotionValue = function ()
+    {
+        var totalDiscountPromotionValue = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                totalDiscountPromotionValue = totalDiscountPromotionValue + productType.totalDiscountPromotionValue;
+        }
+        return totalDiscountPromotionValue;
+    }
+
+    this.getTotalVATPrice = function ()
+    {
+        var totalVATPrice = 0;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+                totalVATPrice = totalVATPrice + productType.totalVATPrice;
+        }
+        return totalVATPrice;
+    }
+
+    this.getTotalShipFee = function ()
+    {
+        var totalShipFee = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+            {
+                if (productType.totalShipFee == null)
+                    return null;
+                if(totalShipFee==null)
+                    totalShipFee=0;
+                if(productType.totalShipFee!='fail')
+                    totalShipFee = totalShipFee + productType.totalShipFee;
+            }
+        }
+        return totalShipFee;
+    }
+
+    this.getTotalPayPrice = function ()
+    {
+        var totalPayPrice = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (!productType.disable)
+            {
+                if (productType.totalPayPrice == null)
+                    return null;
+                if(totalPayPrice==null)
+                    totalPayPrice=0;
+                if(productType.totalPayPrice!='fail')
+                    totalPayPrice = totalPayPrice + productType.totalPayPrice;
+            }
+        }
+        return totalPayPrice;
+    }
+
+    this.clearAddressAndPayType = function (change)
+    {
+        this.shoppingCart.address = null;
+        this.shoppingCart.payType = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            productType.info.Product.ship_fee = null;
+            if (!productType.disable)
+                if (change == undefined || change == true)
+                    this.changeProductType(productType, false);
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.clearAddress = function (change)
+    {
+        this.shoppingCart.address = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            productType.info.Product.ship_fee = null;
+            if (!productType.disable)
+                if (change == undefined || change == true)
+                    this.changeProductType(productType, false);
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.setAddress = function (address)
+    {
+        this.shoppingCart.address = address;
+        this.writeContent();
+    }
+
+    this.getAddress = function (address)
+    {
+        return this.shoppingCart.address;
+    }
+
+    this.clearPayType = function ()
+    {
+        this.shoppingCart.payType = null;
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            productType.info.Product.ship_fee = null;
+            if (!productType.disable)
+                if (change == undefined || change == true)
+                    this.changeProductType(productType, false);
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.setPayType = function (payType)
+    {
+        this.shoppingCart.payType = payType;
+        this.writeContent();
+    }
+
+    this.getPayType = function (payType)
+    {
+        return this.shoppingCart.payType;
+    }
+
+    this.calculatorShipFee = function ()
+    {
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType=this.shoppingCart.productTypes[key];
+            productType.totalShipFee=null;
+            productType.totalPayPrice=null;
+        }
+
+        this.shoppingCart.totalShipFee=null;
+        this.shoppingCart.totalPayPrice=null;
+
+        var products = this.getProducts();
+        this.shipFee(products);
+    }
+
+    this.calculatorProductTypeShipFee = function (productType)
+    {
+        if (productType.disable)
+            return;
+        var products = {};
+        var productId = productType.info.Product.id;
+        var count = productType.count;
+        var promotionCode = productType.info.Product.promotion_code;
+        var product = {product_id: productId, count: count, promotion_code: promotionCode};
+        products[productId] = product;
+        this.shipFee(products);
+    }
+
+    this.shipFee = function (products)
+    {
+        var tmpProducts=products;
+        $.ajax({
+            url: "/ShoppingCarts/get_ship_fee",
+            type: 'POST',
+            dataType: 'JSON',
+            data: {products: products},
+        })
+        .done(function (data)
+        { 
+            if (data.success||true)
+            {
+                var products = data.data;
+                for (var key in products)
+                {
+                    var product = products[key];
+                    var productId = product.product_id;
+                    var productType = this.shoppingCart.productTypes[productId];
+                    if (product.totalFee != null)
+                    {
+                        productType.info.Product.ship_fee = parseInt(product.totalFee);
+                        this.changeProductType(productType,false);
+                    }
+                    else
+                    {
+                        this.changeProductType(productType,false);
+                        productType.info.Product.ship_fee = "fail";
+                        productType.totalShipFee = "fail";
+                        productType.totalPayPrice="fail";
+                    }
+                }
+                this.change();
+            } 
+        }.bind(this))
+        .fail(function ()
+        {
+            toastr.error("Kết nối có lỗi vui lòng kiểm tra lại!");
+            for (var key in tmpProducts)
+            {
+                var productType = this.shoppingCart.productTypes[key];
+                this.changeProductType(productType,false);
+                productType.info.Product.ship_fee = "fail";
+                productType.totalPayPrice="fail";
+                productType.totalPayPrice="fail";
+            }
+            this.change();
+        }.bind(this))
+        .always(function ()
+        {
+        });
+    }
+
+    this.setBalance = function (balance)
+    {
+        this.shoppingCart.balance = balance;
+    }
+
+    this.clearOfferPrice = function (change)
+    {
+        for (var key in this.shoppingCart.productTypes)
+        {
+            var productType = this.shoppingCart.productTypes[key];
+            if (productType.info.Product.note == "OffersPrice")
+            {
+                productType.info.Product.price_discount = productType.info.Product.tmp_price_discount;
+                productType.info.Product.tmp_price_discount = null;
+                productType.info.Product.discount_value = productType.info.Product.tmp_discount_value;
+                productType.info.Product.tmp_discount_value = null;
+                productType.info.Product.note = null;
+                if (!productType.disable)
+                    if (change == undefined || change == true)
+                        this.changeProductType(productType, false);
+            }
+        }
+        if (change == undefined || change == true)
+            this.change();
+    }
+
+    this.clear = function ()
+    {
+        this.init();
+    }
+
+    this.destroy = function ()
+    {
+        if(isSupportLocalstorage())
+        {
+            localStorage.removeItem("ShoppingCart");
+        }
+        else
+        {
+            for(var i=1;i<=10;i++)
+            {
+                removeCookie("ShoppingCart"+i);
+            }
+            this.shoppingCart = null;
+        }
+    }
+
+    this.readContent = function ()
+    {
+        if(isSupportLocalstorage())
+        {
+            var str = localStorage.getItem("ShoppingCart");
+        }
+        else
+        {
+            var str="";
+            for(var i=1;i<=10;i++)
+            {
+                var substr=getCookieShop("ShoppingCart"+i);
+                if(substr!=null)
+                {
+                    str=str+substr;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        }
+        if(str==""||str==null)
+            return null;
+        this.shoppingCart = JSON.parse(str);
+        return this.shoppingCart;
+    }
+
+    this.writeContent = function ()
+    {
+        var str = JSON.stringify(this.shoppingCart);
+        if(isSupportLocalstorage())
+        {
+            localStorage.setItem("ShoppingCart", str);
+        }
+        else
+        {
+            for(var i=1;i<=10;i++)
+            {
+                removeCookieShop("ShoppingCart"+i);
+            }
+            var totalByteSize=byteSize(str);
+            var countCookie=Math.ceil(totalByteSize/3900);
+            var charCountCookie=Math.ceil(str.length/countCookie);
+            for(var i=1;i<=countCookie;i++)
+            {
+                var index=(i-1)*charCountCookie;
+                var subStr=str.substring(index,index+charCountCookie);
+                setCookieShop("ShoppingCart"+i,subStr,60);
+            }
+        }
+    }
+
+    this.realoadShoppingCart = function ()
+    {
+        this.shoppingCart = this.readContent();
+        if ($scope != undefined)
+        {
+            $scope.reloadShoppingCart();
+        }
+    }
+
+    $(window).bind('storage', function (event)
+    {
+        if(event.originalEvent.key=="ShoppingCart")
+            this.realoadShoppingCart();
+    }.bind(this));
+
+    //Construct
+
+    this.init = function ()
+    {
+        this.shoppingCart = {
+            time: new Date(),
+            productTypes: {},
+            address: null,
+            payType: null,
+            productCount: null,
+            productTypeCount: null,
+            totalPrice: 0,
+            totalPriceDiscount: 0,
+            totalDiscountValue: 0,
+            totalPromotionValue: null,
+            totalDiscountPromotionValue: 0,
+            totalVATPrice: 0,
+            totalShipFee: null,
+            totalPayPrice: null,
+            balance: null,
+        };
+        this.writeContent();
+    }
+
+    if (this.readContent() == null)
+        this.init();
+    else
+    {
+        this.readContent();
+        var createdTime = new Date(this.shoppingCart.time);
+        var nowTime = new Date();
+        if (nowTime.getTime() - createdTime.getTime() > 86400 * 1000)
+        {
+            this.destroy();
+            this.init();
+        }
+    }
+    //
+    return this;
+}
+
+//ShoppingCartApp
+if (mokiApp === undefined)
+    var mokiApp = angular.module("mokiApp", []);
+
+mokiApp.filter('orderProductType', ['$filter', function ($filter)
+{
+    return function (productTypes)
+    {
+        var filted = [];
+        var i = 0;
+        for (var key in productTypes)
+        {
+            var productType = productTypes[key];
+            productType.$$hashKey = "object:" + i;
+            filted.push(productType);
+            i++;
+        }
+        ;
+        return $filter('orderBy')(filted, "time", true, function (time1, time2)
+        {
+            var intTime1 = parseInt(time1.value);
+            var intTime2 = parseInt(time2.value);
+            if (intTime1 >= intTime2)
+                return 1;
+            else
+                return -1;
+        });
+
+    };
+}]);
+
+mokiApp.filter('orderEnableProductType', ['$filter', function ($filter)
+{
+    return function (productTypes)
+    {
+        var filted = [];
+        var i = 0;
+        for (var key in productTypes)
+        {
+            var productType = productTypes[key];
+            if (!productType.disable)
+            {
+                productType.$$hashKey = "object:" + i;
+                filted.push(productType);
+                i++;
+            }
+        }
+        ;
+        return $filter('orderBy')(filted, "time", true, function (time1, time2)
+        {
+            var intTime1 = parseInt(time1.value);
+            var intTime2 = parseInt(time2.value);
+            if (intTime1 >= intTime2)
+                return 1;
+            else
+                return -1;
+        });
+
+    };
+}]);
+
+mokiApp.filter('orderDisableProductType', ['$filter', function ($filter)
+{
+    return function (productTypes)
+    {
+        var filted = [];
+        var i = 0;
+        for (var key in productTypes)
+        {
+            var productType = productTypes[key];
+            if (productType.disable)
+            {
+                productType.$$hashKey = "object:" + i;
+                filted.push(productType);
+                i++;
+            }
+        }
+        ;
+        return $filter('orderBy')(filted, "time", true, function (time1, time2)
+        {
+            var intTime1 = parseInt(time1.value);
+            var intTime2 = parseInt(time2.value);
+            if (intTime1 >= intTime2)
+                return 1;
+            else
+                return -1;
+        });
+
+    };
+}]);
+
+mokiApp.factory("ajax", ["$rootScope","$http",function ($rootScope,$http)
+{
+    var obj = {};
+    obj.payShoppingCart = function (params)
+    {
+        $.ajax({
+            url: "/ShoppingCarts/pay_shopping_cart",
+            type: 'POST',
+            dataType: 'JSON',
+            data: params,
+        })
+        .done(function (data)
+        {
+            $rootScope.payShoppingCartResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.payShoppingCartResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+
+    obj.filterProductBought = function (params)
+    {
+        $.ajax({
+            url: "/ShoppingCarts/filter_product_bought",
+            type: 'GET',
+            dataType: 'JSON',
+            data: params,
+            cache: false
+        })
+        .done(function (data)
+        {
+            $rootScope.filterProductBoughtResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.filterProductBoughtResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+
+    obj.addAddress = function (params)
+    {
+            //kiem tra hop le
+            var addr_id = $('input[name="optradio"]:checked').val();
+            if (addr_id === undefined)
+            {
+                toastr.error("Vui lòng chọn địa chỉ");
+                return false;
+            }
+            if ((typeof addr_id == "undefined" || addr_id == 0) && $('input[name="data[UserOrderAddress][address]"]').val() == "") {
+                toastr.error("Bạn chưa nhập Số nhà, Xóm, Tổ, Đường.");
+                return false;
+            }
+            //console.log(params);
+            $.ajax({
+                url: "/ShoppingCarts/checkout",
+                type: 'POST',
+                dataType: 'JSON',
+                data: params,
+            })
+            .done(function (data)
+            {
+                $rootScope.addAddressResponse(true, data);
+            })
+            .fail(function ()
+            {
+                $rootScope.addAddressResponse(false);
+            })
+            .always(function ()
+            {
+            });
+        }
+
+        obj.addBookAddress = function (params)
+        {
+            if (!$("#inputAddress").valid()) {
+                return false;
+            }
+            $.ajax({
+                url: "/ShoppingCarts/add_address",
+                type: 'POST',
+                dataType: 'JSON',
+                data: params,
+            })
+            .done(function (data)
+            {
+                $rootScope.addBookAddressResponse(true, data);
+            })
+            .fail(function ()
+            {
+                $rootScope.addBookAddressResponse(false);
+            })
+            .always(function ()
+            {
+            });
+        }
+        obj.editBookAddress = function (params)
+        {
+            var addr_id = window.location.href.substr(window.location.href.lastIndexOf("/") + 1);
+           // console.log(params);
+           if (!$("#inputAddress").valid()) {
+            return false;
+        }
+        $.ajax({
+            url: "/ShoppingCarts/edit_address/" + addr_id,
+            type: 'POST',
+            dataType: 'JSON',
+            data: params,
+        })
+        .done(function (data)
+        {
+            $rootScope.editBookAddressResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.editBookAddressResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+
+    obj.choicePaymentType = function (params)
+    {
+        $.ajax({
+            url: "/ShoppingCarts/choice_payment",
+            type: 'POST',
+            dataType: 'JSON',
+            data: params,
+        })
+        .done(function (data)
+        {
+            $rootScope.choicePaymentResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.choicePaymentResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+
+    obj.getBalance = function ()
+    {
+        $.ajax({
+            url: "/ShoppingCarts/get_balance",
+            type: 'GET',
+            dataType: 'JSON',
+            data: {},
+        })
+        .done(function (data)
+        {
+            $rootScope.getBalanceResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.getBalanceResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+    obj.checkPromotionRunning = false;
+    obj.checkPromotionCode = function (params)
+    {
+        if(obj.checkPromotionRunning)
+            obj.checkPromotionRunning.abort();
+
+        obj.checkPromotionRunning = $.ajax({
+            url: "/ShoppingCarts/check_promotion_code",
+            type: 'GET',
+            dataType: 'JSON',
+            data: params,
+        })
+        .done(function (data)
+        {
+            $rootScope.checkPromotionCodeResponse(true, data);
+        })
+        .fail(function ()
+        {
+            $rootScope.checkPromotionCodeResponse(false);
+        })
+        .always(function ()
+        {
+        });
+    }
+
+    return obj;
+}]);
+
+mokiApp.factory('shoppingCartService', ["$rootScope", function ($rootScope)
+{
+    var shoppingCart = new ShoppingCart($rootScope);
+    return shoppingCart;
+}]);
+
+mokiApp.controller('PaymentController', ["$scope", "$rootScope"
+    , "shoppingCartService", "ajax", function ($scope, $rootScope, shoppingCartService, ajax)
+    {
+        //console.log("pppppppppppppppppppppppp");
+        try{console.log(shoppingCartService.shoppingCart.productTypes["315006"].info.Product.note);}
+        catch (ex){console.log(null)}
+        $rootScope.reloadShoppingCart = function ()
+        {
+            if (!$scope.$$phase)
+                $scope.$apply()
+            if (!$rootScope.$$phase)
+                $rootScope.$apply();
+        }
+
+        $scope.changePayType = function ()
+        {
+            var strBalance = $("#balanceI").val();
+            var balance = parseInt(strBalance);
+            if (balance < shoppingCartService.shoppingCart.totalVATPrice)
+            {
+                shopAlert("MOKI Point của bạn hiện tại: " + convertPriceToStr(balance) + " đồng. Số tiền này không đủ để thực hiện thanh toán cho đơn hàng này.");
+                return false;
+            }
+        }
+
+        $scope.choicePayType = function ()
+        {
+            var payType = $("#valueI").val();
+            var params = {type: payType};
+            ajax.choicePaymentType(params);
+        }
+
+        $rootScope.choicePaymentResponse = function (success, data)
+        {
+            if (success)
+            {
+                shoppingCartService.setPayType(data.type);
+
+                window.location = "/ShoppingCarts/order_info";
+            } else
+            toastr.error("Kết nối có lỗi vui lòng thử lại!");
+        }
+
+        $(document).ready(function ()
+        {
+            $("#mokiPointLi").click(function ()
+            {
+                return $scope.changePayType();
+            });
+        });
+    }]);
+
+mokiApp.controller('CountController', ["$scope", "$rootScope"
+    , "shoppingCartService", "ajax", function ($scope, $rootScope, shoppingCartService, ajax)
+    {   
+        $scope.shoppingCartService = shoppingCartService;
+        $rootScope.reloadShoppingCart = function ()
+        {
+            if (!$scope.$$phase)
+                $scope.$apply()
+            if (!$rootScope.$$phase)
+                $rootScope.$apply();
+        }
+
+        $scope.checkLogout = function ()
+        {
+            var logout = $("#logoutI").val();
+            if (logout)
+            {
+                shoppingCartService.clearOfferPrice(false);
+                shoppingCartService.clearDisableProductType(false);
+                shoppingCartService.clearAddressAndPayType(true);
+            }
+        }
+        
+        $scope.filterProductBought = function ()
+        {
+            var products = shoppingCartService.getTotalProducts();
+            if (Object.keys(products).length != 0)
+            {
+                var params = {products: products};
+                ajax.filterProductBought(params);
+            }
+        }
+        
+        $rootScope.filterProductBoughtResponse = function (success, data)
+        {
+            if (success)
+            {
+                var changed = false;
+                var products = data["data"];
+                for (var key in products)
+                {
+                    var product = products[key];
+                    var id = key;
+                    var productType = shoppingCartService.shoppingCart.productTypes[id];
+                    if(product==null)
+                    {
+                        changed=true;
+                        productType=shoppingCartService.shoppingCart.productTypes[id];
+                        productType.cause="Sản phẩm đã bị xóa."
+                        shoppingCartService.disableProductType(productType,false);
+                        continue;
+                    }
+                    else
+                    {
+                        if(productType.cause=="Sản phẩm đã bị xóa.")
+                        {
+                            changed=true;
+                            shoppingCartService.enableProductType(productType,false);
+                            productType.cause=null;
+                        }
+                    }
+                    if(product.image!=undefined&&product.image!=null)
+                        product.image[0].url = product.image[0].url.replace("/o/","/320s/");
+                    var name=product.name;
+                    var price=product.price;
+                    var pricePercent=product.price_percent;
+                    if(pricePercent==0)
+                    {
+                        var priceDiscount=price;
+                        var discountValue=null;
+                    }
+                    else
+                    {
+                        if(pricePercent<=100)
+                        {
+                            var priceDiscount=price*(100-pricePercent)/100;
+                            priceDiscount=ceilPrice(priceDiscount);
+                            var discountValue="KM "+pricePercent+"%";
+                        }
+                        else
+                        {
+                            var priceDiscount=price-pricePercent;
+                            priceDiscount=ceilPrice(priceDiscount);
+                            var discountValue="KM "+convertPriceToStr(pricePercent)+"đ";
+                        }
+                    }
+                    var images=product.image;
+                    var offers = product.offers;
+                    var canBuy = product.can_buy;
+                    var isBlocked = product.is_blocked;
+                    var promotionValue=product.promotion_value;
+                    var tmpPromotionCode=product.tmp_promotion_code;
+                    productType.info.Product.name=name;
+                    if(product.image!=undefined&&product.image!=null)        
+                        productType.info.ProductOtherImage[0].image= product.image[0].url;
+                    productType.info.Product.price=price;
+                    productType.info.Product.price_discount=priceDiscount;
+                    productType.info.Product.discount_value=discountValue;
+                    shoppingCartService.changeProductType(productType);
+                    if(promotionValue!=false)
+                        shoppingCartService.setPromotionValue(tmpPromotionCode,promotionValue,productType);
+                    else
+                        shoppingCartService.setPromotionValue(null,null,productType);
+                    
+                    if(!data["logged"])
+                    {
+                        shoppingCartService.clearOfferPrice(false);
+                        shoppingCartService.clearDisableProductType(false);
+                        shoppingCartService.clearAddressAndPayType(true);
+                        return ;
+                    }
+                    if ((canBuy != "1" && canBuy !="-4")||isBlocked==1)
+                    {
+                        changed = true;
+                        switch (canBuy)
+                        {
+                            case "0":
+                            productType.cause = "Sản phẩm này đã bán.";
+                            break;
+                            case "2":
+                            productType.cause = "Bạn đã mua sản phẩm này.";
+                            break;
+                            case "-1":
+                            productType.cause = "Không thể mua sản phẩm của chính bạn.";
+                            break;
+                            case "-2":
+                            productType.cause = "Người bán nghỉ bán.";
+                            break;
+                            case "-3":
+                            productType.cause = "Bạn chưa đánh giá sản phẩm mua trước.";
+                            break;
+                        }
+                        
+                        if(isBlocked==1)
+                            productType.cause = "Người bán đã yêu cầu chặn bạn.";
+                        shoppingCartService.disableProductType(productType, false);
+                    } 
+                    else
+                    {
+                        if(shoppingCartService.isDisableProductType(productType))
+                        {
+                            changed=true;
+                            shoppingCartService.enableProductType(productType,false);
+                        }
+                        if (offers != 0)
+                        {
+                            changed = true;
+                            shoppingCartService.setOfferPrice(productType, offers, false);
+                        }
+                    }
+                }
+                if (changed)
+                    shoppingCartService.change();
+                
+                if (window.location.pathname == "/ShoppingCarts/check_product_bought")
+                {
+                    if (changed)
+                    {
+                        shopAlert("Giỏ hàng của bạn đã bị thay đổi do 1 số sản phẩm không hợp lệ.",function ()
+                        {
+                            window.location = "/ShoppingCarts/index";
+                        });
+                    } 
+                    else
+                    {
+                        window.location = "/ShoppingCarts/checkout";
+                    }
+                }
+            }
+        }
+        $(".angualar_load_parent").removeClass("angualar_load_parent");
+        $(".angualar_load_child").removeAttr("hidden");
+        $(".angualar_load_child").removeClass("angualar_load_child"); 
+        $scope.filterProductBought(); 
+    }]);
+
+mokiApp.controller('ShoppingCartController', ["$scope", "$rootScope"
+    , "shoppingCartService", "ajax", function ($scope, $rootScope, shoppingCartService, ajax)
+    {
+        $scope.shoppingCartService = shoppingCartService;
+        $scope.product = null;
+
+    $scope.buy = function (jsonStr)
+    {
+        var str = $("#jsonI").val();
+        
+        $scope.product = JSON.parse(str);
+        $scope.product.Product.url = window.location.pathname;
+        $scope.product.Product.ship_fee = null;
+        $scope.product.Product.promotion_code = null;
+        $scope.product.Product.promotion_value = null;
+        
+        if ($scope.product.Product.price == 0)
+        {
+            shopAlert("Xin vui lòng tải và cài đặt ứng dụng MOKI để thực hiện giao dịch nhận sản phẩm miễn phí.", function(){}, "Đóng");
+            return;
+        }
+        
+        if ($scope.product.Product.offers != 0)
+        {
+            $scope.product.Product.tmp_price_discount = $scope.product.Product.price_discount;
+            $scope.product.Product.price_discount = $scope.product.Product.offers;
+            $scope.product.Product.tmp_discount_value = $scope.product.Product.discount_value;
+            $scope.product.Product.discount_value = "Thương lượng";
+            $scope.product.Product.note = "OffersPrice";
+        } else
+        {
+            if ($scope.product.Product.discount_value != null)
+                $scope.product.Product.discount_value = replaceDiscountValueView
+            ($scope.product.Product.discount_value);
+        }
+        
+        if (shoppingCartService.getProductCountById($scope.product) >= 1)
+        {
+            shopAlert("Số lượng sản phẩm này chỉ có 1 và đã có trong giỏ hàng của bạn.");
+            return;
+        }
+        
+        if($scope.product.Product.is_blocked==1)
+        {
+            shopAlert("Người bán đã yêu cầu chặn bạn.");
+            return ;
+        }
+        
+        switch ($scope.product.Product.can_buy)
+        {
+            case "0":
+            shopAlert("Sản phẩm này đã bán.");
+            return ; 
+            case "2":
+            shopAlert("Bạn đã mua sản phẩm này.");
+            return ;
+            case "-1":
+            shopAlert("Không thể mua sản phẩm của chính bạn.");
+            return ;
+            case "-2":
+            shopAlert("Người bán nghỉ bán.");
+            return ;
+            case "-3":
+            shopAlert("Bạn chưa đánh giá sản phẩm mua trước.",function ()
+            {
+                window.location="/ShoppingCarts/manager_order";
+            });
+            return ;
+        }
+        
+        var time=0;
+        if(shoppingCartService.getProductCount()==0)
+        {
+            var userId=$("#buyBt").attr("data-userid");
+            if(userId==undefined||userId==null||userId=="")
+                userId=0;
+            var url="moki://type=order_product&login=1&product_id="+$scope.product.Product.id+"&user_id="+userId;
+            var xxx=false;
+            if(getIsMobile().Android()!=undefined&&getIsMobile().Android()!=null)
+            {
+                xxx=true;
+                shopConfirm("Mua hàng trên app sẽ có nhiều ưu đãi. Bạn có muốn chuyển sang app?",function(result)
+                {
+                    if(result)
+                        window.location=url;
+                    setTimeout(function ()
+                    {
+                        shoppingCartService.addProduct($scope.product);
+                        $("#download").modal("show");
+                        $('.multiple-items').resize();
+                    },time);
+                });
+            }
+
+            if(getIsMobile().iOS()!=undefined&&getIsMobile().iOS()!=null)
+            {
+                xxx=true;
+                shopConfirm("Mua hàng trên app sẽ có nhiều ưu đãi. Bạn có muốn chuyển sang app?",function (result)
+                {
+                    if(result)
+                    {
+                        window.location=url;
+                        time=1000;
+                    }
+                    setTimeout(function ()
+                    {
+                        shoppingCartService.addProduct($scope.product);
+                        $("#download").modal("show");
+                        $('.multiple-items').resize();
+                    },time);
+                });
+            }
+
+            if(getIsMobile().Windows()!=undefined&&getIsMobile().Windows()!=null)
+            {
+                xxx=true;
+                var change=shopConfirm("Mua hàng trên app sẽ có nhiều ưu đãi. Bạn có muốn chuyển sang app?",function (result)
+                {
+                    if(result)
+                    {
+                        window.location=url;
+                        time=1000;
+                    }
+                    setTimeout(function ()
+                    {
+                        shoppingCartService.addProduct($scope.product);
+                        $("#download").modal("show");
+                        $('.multiple-items').resize();
+                    },time);
+                });
+            }
+            if(xxx==false)
+            {
+                shoppingCartService.addProduct($scope.product);
+                $("#download").modal("show");
+                $('.multiple-items').resize();
+            }
+        }
+        else
+        {
+            shoppingCartService.addProduct($scope.product);
+            $("#download").modal("show");
+            $('.multiple-items').resize();
+        }
+    }
+
+    $scope.payShoppingCart = function ()
+    {
+        var payType = shoppingCartService.getPayType();
+        var address = shoppingCartService.getAddress();
+        if (payType == null)
+        {
+            toastr.error("Bạn chưa chọn phương pháp thanh toán.");
+            return;
+        }
+
+        if (address == null)
+        {
+            toastr.error("Bạn chưa chọn địa chỉ.");
+            return;
+        }
+        if (shoppingCartService.getCanBuyProductCount()==0)
+        {
+            toastr.error("Không có sản phẩm hợp lệ để thanh toán.");
+            return;
+        }
+        if (shoppingCartService.shoppingCart.payType == 2)
+            ajax.getBalance();
+        else
+        {
+            $("#payBt").attr("disabled", true);
+            $("#payBtmb").attr("disabled", true);
+            var params = {};
+            var products = shoppingCartService.getProducts();
+            params.products = products;
+            ajax.payShoppingCart(params);
+        }
+    }
+
+    $rootScope.getBalanceResponse = function (success, data)
+    {
+        if (success)
+        {
+            if (data.success)
+            {
+                var balance = data.balance;
+                shoppingCartService.setBalance(balance);
+                if (shoppingCartService.shoppingCart.balance < shoppingCartService.shoppingCart.totalPayPrice)
+                {
+                    shopAlert("MOKI Point của bạn hiện tại: " + balance + " đồng. Số tiền này không đủ để thực hiện thanh toán cho đơn hàng này.");
+                    return;
+                }
+                var params = {};
+                var products = shoppingCartService.getProducts();
+                params.products = products;
+                ajax.payShoppingCart(params);
+            } else
+            toastr.error(data.message);
+        } else
+        toastr.error("Kết nối có lỗi vui lòng kiểm tra!")
+    }
+
+    $scope.filterProductBought = function ()
+    {
+        var products = shoppingCartService.getTotalProducts();
+        if (Object.keys(products).length != 0)
+        {
+            var params = {products: products};
+            ajax.filterProductBought(params);
+        }
+    }
+
+    $scope.addAddress = function ()
+    {
+        if (true)
+        {
+            var params = $("#addressForm").serialize();
+            ajax.addAddress(params);
+        }
+    }
+
+    $scope.addBookAddress = function ()
+    {
+        if (true)
+        {
+            var params = $("#addressBookForm").serialize();
+            ajax.addBookAddress(params);
+        }
+    }
+
+    $scope.editBookAddress = function ()
+    {
+        if (true)
+        {
+            var params = $("#editaddressBookForm").serialize();
+            ajax.editBookAddress(params);
+        }
+    }
+
+    $rootScope.addAddressResponse = function (success, data)
+    {
+        if (success)
+        {
+            if (data.success)
+            {
+                shoppingCartService.setAddress(false);
+                var current_addr_id = $('input[name="optradio"]:checked').val();
+                if(current_addr_id ==0){
+                    toastr.success("Thêm mới địa chỉ thành công!");
+                }
+                window.location = "/ShoppingCarts/payment";
+            } else
+            toastr.error(data.message);
+        } else
+        toastr.error("Kết nối có lỗi vui lòng kiểm tra lại!");
+    }
+
+    $rootScope.addBookAddressResponse = function (success, data)
+    {
+        if (success)
+        {
+            if (data.success)
+            {
+                shoppingCartService.setAddress(false);
+                toastr.success("Thêm địa chỉ thành công");
+                setTimeout(function(){ window.location = "/ShoppingCarts/address_book"; }, 3000);
+            } else
+            toastr.error(data.message);
+        } else
+        toastr.error("Kết nối có lỗi vui lòng kiểm tra lại!");
+    }
+
+    $rootScope.editBookAddressResponse = function (success, data)
+    {
+        if (success)
+        {
+            if (data.success)
+            {
+                shoppingCartService.setAddress(false);
+                toastr.success("Cập nhật địa chỉ thành công!");
+                setTimeout(function(){
+                    window.location = "/ShoppingCarts/address_book";
+                },3000);
+            } else
+            toastr.error(data.message);
+        } else
+        toastr.error("Kết nối có lỗi vui lòng kiểm tra lại!");
+    }
+
+    $scope.calculateShipFee = function ()
+    {
+        if (shoppingCartService.shoppingCart.payType != null
+            && shoppingCartService.shoppingCart.address != null)
+        {
+            if (shoppingCartService.shoppingCart.payType == false
+                || shoppingCartService.shoppingCart.address == false)
+            {
+                shoppingCartService.calculatorShipFee();
+                shoppingCartService.shoppingCart.payType = true;
+                shoppingCartService.shoppingCart.address == true;
+            }
+        }
+    }
+
+    var clearVar;
+    var errorTimeout=null;
+    $scope.checkPromotionCode = function (productType)
+    {
+        var productId=productType.info.Product.id;
+        var promotionCode=$("#codeI"+productId).val();
+        //var promotionCode = productType.info.Product.tmp_promotion_code;
+        productType.info.Product.tmp_promotion_code=promotionCode;
+        if (promotionCode != null && promotionCode != "" && promotionCode.length >= 6
+            && promotionCode.length <= 10)
+        {
+            clearTimeout(clearVar);
+            clearVar = setTimeout(function ()
+            {
+                var params = {
+                    product_id: productType.info.Product.id,
+                    promotion_code: promotionCode,
+                };
+                ajax.checkPromotionCode(params);
+            }, 1200);
+        }
+        else
+        {
+            // shoppingCartService.setPromotionValue(null, null, productType);
+            // clearTimeout(clearVar);
+            // clearVar=setTimeout(function ()
+            // {
+            //     if(promotionCode.length )
+            //     {
+            //         toastr.error("Mã khuyến mại không hợp lệ.");
+            //     }
+            // },1200);
+        }
+    }
+
+    $rootScope.checkPromotionCodeResponse = function (success, data)
+    {
+        if (success)
+        {
+            var productId = data.product_id;
+            var productType = shoppingCartService.shoppingCart.productTypes[productId];
+            if (data.success)
+            {
+                var promotionValue = data.discount;
+                var promotionCode = productType.info.Product.tmp_promotion_code;
+            } else
+            {
+                var promotionValue = null;
+                var promotionCode = null;
+                toastr.error("Mã khuyến mại không hợp lệ");
+            }
+            shoppingCartService.setPromotionValue(promotionCode, promotionValue, productType);
+        } else
+        {
+            toastr.error("Kết nối có lỗi vui lòng kiểm tra đường truyền!")
+        }
+    }
+
+    $scope.removeProduct = function (productType)
+    {
+        shopConfirm('Bạn có muốn xóa sản phẩm khỏi giỏ hàng không?',function(result)
+        {
+            if(result)
+                $scope.shoppingCartService.removeProductType(productType);
+        });      
+    }
+
+    $rootScope.reloadShoppingCart = function ()
+    {
+        if (!$scope.$$phase)
+            $scope.$apply()
+        if (!$rootScope.$$phase)
+            $rootScope.$apply();
+    }
+
+    $scope.resultProducts = {};
+    $scope.nextUrl;
+    $rootScope.payShoppingCartResponse = function (success, data)
+    {
+        if (success)
+        {
+            if (data.success)
+            {
+                toastr.success(data.message);
+                shoppingCartService.clear();
+                window.location = "/ShoppingCarts/pay_success";
+            } 
+            else
+            {
+                toastr.error("Có lỗi");
+                for (var key in shoppingCartService.shoppingCart.productTypes)
+                {
+                    var productType = shoppingCartService.shoppingCart.productTypes[key];
+                    var resultProduct = {};
+                    resultProduct.name = productType.info.Product.name;
+                    resultProduct.id = productType.info.Product.id;
+                    $scope.resultProducts[resultProduct.id] = resultProduct;
+                }
+                var failProducts = data["data"];
+                if (Object.keys(failProducts).length == shoppingCartService.getProductCount())
+                    $scope.nextUrl = "/san-pham";
+                else
+                    $scope.nextUrl = "/ShoppingCarts/pay_success";
+                for (var key in failProducts)
+                {
+                    var failProduct = failProducts[key];
+                    var id = failProduct.id;
+                    var message = failProduct.message;
+                    var code = failProduct.code;
+                    var resultProduct = $scope.resultProducts[id];
+                    resultProduct.success = false;
+                    resultProduct.message = message;
+                }
+                shoppingCartService.clear();
+                shoppingCartService.shoppingCart.totalShipFee=0;
+                shoppingCartService.shoppingCart.totalPayPrice=0;
+                $("#myModal").modal("show");
+                $('.multiple-items').resize();
+                $rootScope.reloadShoppingCart();
+            }
+        } else
+        toastr.error("Kết nối có lỗi vui lòng thử lại.");
+    }
+
+    $scope.closeResultModal = function ()
+    {
+        if (shoppingCartService.getProductCount() == 0)
+        {
+            window.location = $scope.nextUrl;
+            shoppingCartService.shoppingCart.totalShipFee=null;
+            shoppingCartService.shoppingCart.totalPayPrice=null;
+        }
+
+    }
+
+    $scope.sessionFinish = function ()
+    {
+        shoppingCartService.clearAddressAndPayType();
+    }
+
+    $scope.formatPrice = function (price, priceType, position)
+    {
+        if (price == null)
+            return "";
+
+        if (price == 0)
+        {
+            if (priceType == undefined)
+                return "0 đ";
+            if (priceType == "base")
+            {
+                if (position == undefined)
+                    return "0 đ";
+                if (position == "single")
+                    return "Miễn phí";
+                if (position == "caculate")
+                    return "0 đ";
+            }
+        }
+
+        return convertPriceToStr(price) + "đ";
+    }
+
+    $scope.convertObjectToArray = function (productTypes)
+    {
+        var array = [];
+        for (var key in productTypes)
+        {
+            var productType = productTypes[key];
+            array.push(productType);
+        }
+        return array;
+    }
+    switch (window.location.pathname)
+    {
+        case "/ShoppingCarts/checkout":
+        case "/ShoppingCarts/payment":
+        case "/ShoppingCarts/order_info":
+        case "/ShoppingCarts/paysuccess":
+        if(shoppingCartService.getProductCount()==0)
+            window.location="/ShoppingCarts/index";
+        break;    
+
+    }
+}]);
+
+var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9+/=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/rn/g,"n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t;}};

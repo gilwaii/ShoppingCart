@@ -1,0 +1,134 @@
+
+$(window).ready(function($) {
+  $('.megamenu-container-1').css("width",$('.main-header-inner').innerWidth());
+});
+$( window ).resize(function() {
+  $('.megamenu-container-1').css("width",$('.main-header-inner').innerWidth());
+});
+
+$(window).ready(function($) {
+  $('.megamenu-container-2').css("width",$('.main-header-inner').innerWidth());
+});
+$( window ).resize(function() {
+  $('.megamenu-container-2').css("width",$('.main-header-inner').innerWidth());
+});
+
+$(window).ready(function($) {
+  $('.megamenu-container-1').css("width",$('.copy-right-group').innerWidth());
+});
+$( window ).resize(function() {
+  $('.megamenu-container-1').css("width",$('.copy-right-group').innerWidth());
+});
+$(window).ready(function($) {
+  $('.megamenu-container-2').css("width",$('.copy-right-group').innerWidth());
+});
+$( window ).resize(function() {
+  $('.megamenu-container-2').css("width",$('.copy-right-group').innerWidth());
+});
+
+function addaffix(scr){
+  if($(window).innerWidth() >= 992){
+    if(scr > 165){
+      if(!$('.main-header').hasClass('affix')){
+        $('.main-header').addClass('affix').addClass('fadeInDown animated');
+        $('.main-header').find('.main-header-inner img').attr('src', '/moki/themes/img/logo_small.png');
+      }
+    }
+    else{
+      if($('.main-header').hasClass('affix')){          
+        $('.main-header').removeClass('affix').removeClass('fadeInDown animated');
+        $('.main-header').find('.main-header-inner img').attr('src', '/moki/themes/img/logo_medium.png');
+      }
+    }
+  }
+  else $('.main-header').removeClass('affix fadeInDown');
+}
+$(window).scroll(function() {
+  var scrollTop = $(this).scrollTop();
+  addaffix(scrollTop);
+});
+$( window ).resize(function() {
+  var scrollTop = $(this).scrollTop();
+  addaffix(scrollTop);
+});
+
+$(document).ready(function($) {
+  if($(".home-productslider").length){
+    $(".home-productslider").owlCarousel({
+      navigation : true,
+      pagination: false,
+      lazyLoad : true,
+      autoPlay: 3000,
+
+      paginationSpeed: 800,
+      items: 3,
+      slideSpeed : 200,
+      rewindSpeed : 1000,
+      itemsDesktop : [1199,3],
+      itemsDesktopSmall : [979,2],
+      itemsTablet: [768,2],
+      itemsTabletSmall: [540,1],
+      itemsMobile : [360,1],
+      navigationText: ['<i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i>', '<i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i>']
+    });
+  }
+
+  $(".best-slider").owlCarousel({
+    navigation : true,
+    pagination: false,
+    autoPlay: true,
+    items: 1,
+    slideSpeed : 200,
+    paginationSpeed : 800,
+    rewindSpeed : 1000,
+    itemsDesktop : [1199,1],
+    itemsDesktopSmall : [979,1],
+    itemsTablet: [768,1],
+    itemsTabletSmall: [540,1],
+    itemsMobile : [360,1],
+    navigationText: ['<i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i>', '<i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i>']
+  });
+
+  $(".home_ouroffer-slider").owlCarousel({
+    navigation : true,
+    pagination: false,
+    autoPlay: true,
+    lazyLoad : true,
+    items: 4,
+    slideSpeed : 200,
+    paginationSpeed : 800,
+    rewindSpeed : 1000,
+    itemsDesktop : [1199,4],
+    itemsDesktopSmall : [979,4],
+    itemsTablet: [768,3],
+    itemsTabletSmall: [540,2],
+    itemsMobile : [360,2],
+    navigationText: ['<i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i>', '<i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i>']
+  });
+
+  $("#footer_partner-content").owlCarousel({
+    navigation : true,
+    pagination: false,
+    autoPlay: true,
+    items: 4,
+    slideSpeed : 200,
+    lazyLoad : true,
+    paginationSpeed : 800,
+    rewindSpeed : 1000,
+    itemsDesktop : [1199,4],
+    itemsDesktopSmall : [979,4],
+    itemsTablet: [768,4],
+    itemsTabletSmall: [540,2],
+    itemsMobile : [360,2],
+    navigationText: ['<i class="fa fa-angle-left" title="Previous" data-toggle="tooltip" data-placement="top"></i>', '<i class="fa fa-angle-right" title="Next" data-toggle="tooltip" data-placement="top"></i>']
+  });
+});
+
+$(function(){
+  var url = window.location.href; 
+  $(".navi-group .site-nav a").each(function() {
+    if(url == (this.href)) { 
+      $(this).closest("li").addClass("active");
+    }
+  });
+});
